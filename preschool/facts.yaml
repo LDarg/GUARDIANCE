@@ -1,0 +1,10 @@
+HAPPENINGS:
+  - "Children have finished their work early and are now running around wildly"
+
+CONDITIONS:
+  - description: "A child is crying and needs comfort"
+    resolution: "Comfort the child"
+  - description: "A child has fallen down and needs help to get up"
+    resolution: "Help the child stand up"
+  - description: "A child has scratched its knee and needs band-aids"
+    resolution: "Doctor the child"

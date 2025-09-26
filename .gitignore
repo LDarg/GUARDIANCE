@@ -1,0 +1,8 @@
+.vscode/
+*.egg-info/
+*__.egg__
+__pycache__/
+*.py[cod]
+.DS_Store
+*.egg
+.github

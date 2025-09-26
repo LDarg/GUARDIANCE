@@ -1,0 +1,18 @@
+name: GUARDIANCE
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - pytorch=1.12.1
+  - gymnasium=0.28.1
+  - pygame=2.6.1
+  - numpy=1.24.0
+  - tqdm=4.65.0
+  - networkx=3.3
+  - matplotlib=3.8.0
+  - sympy=1.13.2
+  - pydantic=1.10.12
+  - pip
+  - pip:
+      - -e .
+      - baml-py==0.206.1
