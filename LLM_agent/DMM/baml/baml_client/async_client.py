@@ -76,21 +76,21 @@ class BamlAsyncClient:
     def parse_stream(self):
       return self.__llm_stream_parser
     
-    async def ExtractResume(self, resume: str,
+    async def Rethink_Choice_Of_Action(self, action: types.Output,obligation: types.Obligation,
         baml_options: BamlCallOptions = {},
-    ) -> types.Resume:
+    ) -> types.Output:
         # Check if on_tick is provided
         if 'on_tick' in baml_options:
             # Use streaming internally when on_tick is provided
-            stream = self.stream.ExtractResume(resume=resume,
+            stream = self.stream.Rethink_Choice_Of_Action(action=action,obligation=obligation,
                 baml_options=baml_options)
             return await stream.get_final_response()
         else:
             # Original non-streaming code
-            result = await self.__options.merge_options(baml_options).call_function_async(function_name="ExtractResume", args={
-                "resume": resume,
+            result = await self.__options.merge_options(baml_options).call_function_async(function_name="Rethink_Choice_Of_Action", args={
+                "action": action,"obligation": obligation,
             })
-            return typing.cast(types.Resume, result.cast_to(types, types, stream_types, False, __runtime__))
+            return typing.cast(types.Output, result.cast_to(types, types, stream_types, False, __runtime__))
     async def Take_Action_Preschool(self, agent_zone: types.Zone,station_zones: typing.List["types.Zone"],zone_ids: typing.List["types.Zone"],child_conditions: typing.Optional[typing.List["types.Child_Condition"]] = None,happenings: typing.Optional[typing.List["types.Happening"]] = None,
         baml_options: BamlCallOptions = {},
     ) -> types.Output:
@@ -115,16 +115,16 @@ class BamlStreamClient:
     def __init__(self, options: DoNotUseDirectlyCallManager):
         self.__options = options
 
-    def ExtractResume(self, resume: str,
+    def Rethink_Choice_Of_Action(self, action: types.Output,obligation: types.Obligation,
         baml_options: BamlCallOptions = {},
-    ) -> baml_py.BamlStream[stream_types.Resume, types.Resume]:
-        ctx, result = self.__options.merge_options(baml_options).create_async_stream(function_name="ExtractResume", args={
-            "resume": resume,
+    ) -> baml_py.BamlStream[stream_types.Output, types.Output]:
+        ctx, result = self.__options.merge_options(baml_options).create_async_stream(function_name="Rethink_Choice_Of_Action", args={
+            "action": action,"obligation": obligation,
         })
-        return baml_py.BamlStream[stream_types.Resume, types.Resume](
+        return baml_py.BamlStream[stream_types.Output, types.Output](
           result,
-          lambda x: typing.cast(stream_types.Resume, x.cast_to(types, types, stream_types, True, __runtime__)),
-          lambda x: typing.cast(types.Resume, x.cast_to(types, types, stream_types, False, __runtime__)),
+          lambda x: typing.cast(stream_types.Output, x.cast_to(types, types, stream_types, True, __runtime__)),
+          lambda x: typing.cast(types.Output, x.cast_to(types, types, stream_types, False, __runtime__)),
           ctx,
         )
     def Take_Action_Preschool(self, agent_zone: types.Zone,station_zones: typing.List["types.Zone"],zone_ids: typing.List["types.Zone"],child_conditions: typing.Optional[typing.List["types.Child_Condition"]] = None,happenings: typing.Optional[typing.List["types.Happening"]] = None,
@@ -147,11 +147,11 @@ class BamlHttpRequestClient:
     def __init__(self, options: DoNotUseDirectlyCallManager):
         self.__options = options
 
-    async def ExtractResume(self, resume: str,
+    async def Rethink_Choice_Of_Action(self, action: types.Output,obligation: types.Obligation,
         baml_options: BamlCallOptions = {},
     ) -> baml_py.baml_py.HTTPRequest:
-        result = await self.__options.merge_options(baml_options).create_http_request_async(function_name="ExtractResume", args={
-            "resume": resume,
+        result = await self.__options.merge_options(baml_options).create_http_request_async(function_name="Rethink_Choice_Of_Action", args={
+            "action": action,"obligation": obligation,
         }, mode="request")
         return result
     async def Take_Action_Preschool(self, agent_zone: types.Zone,station_zones: typing.List["types.Zone"],zone_ids: typing.List["types.Zone"],child_conditions: typing.Optional[typing.List["types.Child_Condition"]] = None,happenings: typing.Optional[typing.List["types.Happening"]] = None,
@@ -169,11 +169,11 @@ class BamlHttpStreamRequestClient:
     def __init__(self, options: DoNotUseDirectlyCallManager):
         self.__options = options
 
-    async def ExtractResume(self, resume: str,
+    async def Rethink_Choice_Of_Action(self, action: types.Output,obligation: types.Obligation,
         baml_options: BamlCallOptions = {},
     ) -> baml_py.baml_py.HTTPRequest:
-        result = await self.__options.merge_options(baml_options).create_http_request_async(function_name="ExtractResume", args={
-            "resume": resume,
+        result = await self.__options.merge_options(baml_options).create_http_request_async(function_name="Rethink_Choice_Of_Action", args={
+            "action": action,"obligation": obligation,
         }, mode="stream")
         return result
     async def Take_Action_Preschool(self, agent_zone: types.Zone,station_zones: typing.List["types.Zone"],zone_ids: typing.List["types.Zone"],child_conditions: typing.Optional[typing.List["types.Child_Condition"]] = None,happenings: typing.Optional[typing.List["types.Happening"]] = None,

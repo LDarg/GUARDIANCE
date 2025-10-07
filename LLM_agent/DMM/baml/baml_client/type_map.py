@@ -22,11 +22,11 @@ type_map = {
     "types.Happening": types.Happening,
     "stream_types.Happening": stream_types.Happening,
 
+    "types.Obligation": types.Obligation,
+    "stream_types.Obligation": stream_types.Obligation,
+
     "types.Output": types.Output,
     "stream_types.Output": stream_types.Output,
-
-    "types.Resume": types.Resume,
-    "stream_types.Resume": stream_types.Resume,
 
     "types.Zone": types.Zone,
     "stream_types.Zone": stream_types.Zone,

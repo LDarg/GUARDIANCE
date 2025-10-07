@@ -1,12 +1,13 @@
 from collections import defaultdict
 from GUARDIANCE.interfaces.data_processor import Data_Processor
+import copy
 
 """
 A data_processor for the text version of the text-version of the preschool setting navigated by an LLM agent.
 """
 class Data_Processor_PT(Data_Processor):
     def __init__(self):
-        pass
+        self.extracted_information = None
     
     """
     Input from the environment is already morally relevant facts in propositional form together with the location where they are situated.
@@ -37,6 +38,9 @@ class Data_Processor_PT(Data_Processor):
         }
         relevant_data["agent_zone"] = observation["agent_zone"]
         relevant_data["stations_zones"] = observation["stations_zones"]
+        relevant_data["stations_zones"] = observation["zone_ids"]
+
+        self.extracted_information = relevant_data
         
         return relevant_data
     
@@ -52,8 +56,10 @@ class Data_Processor_PT(Data_Processor):
     """
     all data is passed to the DMM; no filtering is applied.
     """
-    def filter_and_prepare(self, data, guiding_rules, observation):
-
+    def DMM_observation(self, data, guiding_rules):
+        
+        #TODO: check if this makes sense; then, data does not need to be passed 
+        
         child_conditions = [{"child_id": str(data["children"][rule[1]]["child_id"]),
                              "reason": rule[0][0],
                              "required_MAT": rule[0][1],
@@ -67,10 +73,34 @@ class Data_Processor_PT(Data_Processor):
                           "zone_name": data["zones"][rule[1]]["zone_name"]}
                        for rule in guiding_rules if rule[0][0] in [zone["description"] for zone in data["zones"].values()]]
 
-        DMM_input = {"child_conditions": child_conditions, "happenings": happenings}
-        DMM_input["stations_zones"] = data["stations_zones"]
-        DMM_input["agent_zone"] = {"zone_id": str(data["agent_zone"])}
-        DMM_input["zone_ids"] = [{"zone_id": str(zone_id)} for zone_id in observation["zone_ids"]]
+        DMM_observation = {"child_conditions": child_conditions, "happenings": happenings}
+        DMM_observation["stations_zones"] = data["stations_zones"]
+        DMM_observation["agent_zone"] = {"zone_id": str(data["agent_zone"])}
+        DMM_observation["zone_ids"] = [{"zone_id": str(zone_id)} for zone_id in data["zone_ids"]]
         
-        return DMM_input
-       
+        return DMM_observation
+    
+    """
+    GENERAL: data relevant for selecting a default action is selected and transformed such that it can be processed by the guard
+    only instrumentally relvant data can be filtered out while normatively relevant data that was hidden from the DMM (like the existence of a zone) could be taken in 
+
+    PRESCHOOL: similar to the input of the DMM; station zones are filtered out, because they are only relevant for the deployment prupose, not for behaving compliant with normative requirements
+    """
+
+    def guard_observation(self, data, guiding_rules):
+        data = copy.deepcopy(self.extracted_information)
+
+        child_conditions = [{"child_id": str(data["children"][rule[1]]["child_id"]),
+                             "zone_id": str(data["children"][rule[1]]["zone_id"]),
+                            }
+                            for rule in guiding_rules if rule[0][0] in [child["description"] for child in data["children"].values()]]
+        
+        happenings = [{"zone_id": str(data["zones"][rule[1]]["zone_id"]),
+                        "required_MAT": rule[0][1],
+                        "zone_name": data["zones"][rule[1]]["zone_name"]}
+                       for rule in guiding_rules if rule[0][0] in [zone["description"] for zone in data["zones"].values()]]
+        guard_observation = {"child_conditions": child_conditions, "happenings": happenings}
+        guard_observation["agent_zone"] = {"zone_id": str(data["agent_zone"])}
+        guard_observation["zone_ids"] = [{"zone_id": str(zone_id)} for zone_id in data["zone_ids"]]
+
+        return guard_observation

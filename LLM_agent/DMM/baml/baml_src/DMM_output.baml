@@ -35,6 +35,10 @@ class Happening {
   "#)
 }
 
+class Obligation {
+  obligation Happening | Child_Condition
+}
+
 class Output {
   type "move" | "prepare" |"help" @description(#"
     the type of action you want to take (move or prepare)
@@ -74,7 +78,16 @@ function Take_Action_Preschool(agent_zone: Zone, station_zones: Zone[], zone_ids
       Also double check that if you choose to move, you specify the zone you want to move to. You can not simply "move out of a zone". You always have to move TO a specific zone.
       Choose you next action and explicitly state you reasoning behind your decision. 
 
-    {{ ctx.output_format }}
+    {{ ctx.output_format }}«
     "#
 }
 
+function Rethink_Choice_Of_Action(action: Output, obligation:Obligation) -> Output {
+  client CustomGPT4o
+  prompt #"
+  {{ _.role("user") }}
+  Choosing {{ action }} as your next action was nonconform with with your obligation {{ obligation}}.
+  Please choose an action that is conform with {{ obligation }}.
+  Double check your choice for conformity. 
+  "#
+}

@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 class MAT_Mapping(ABC):
     @abstractmethod
-    def action_conform_with_MAT(self, action, MAT, observation) -> bool:
+    def violated_obligation(self, action, MAT, observation) -> bool:
          pass
          """
          Check if the given action conforms with the MAT in the given observation.
@@ -20,7 +20,7 @@ class MAT_Mapping(ABC):
     def execution_conflicted(self, set_of_rules, extracted_data):
         pass
         """
-        determines whehter an action is conform with a MAT rule (function called by the GUARDIANCE after the agent has selected its action)
+        determines whehter an action is conform with a MAT rule (function called by the moral module after the agent has selected its action)
         the methods that can be applied here and the type of guarantees that can be given depend on the environment and the action space of the agent
         
          Args:

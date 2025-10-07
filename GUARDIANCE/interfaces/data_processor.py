@@ -5,21 +5,21 @@ class Data_Processor(ABC):
     def extract_relevant_information(self, reason_theory, observation):
         pass
     """
-    Collect/retrieve/extract data received from the environment that is normatively relevant.
+    Collect/retrieve/extract data received from the environment that is normatively relevant as well as information that is instrumentally relevant.
     In particular, interpret raw data to identify morally relevant facts (reasons), which are currently expected by the reasoning unit to be represented in propositional form.
     The function depends on the environment and the reason theory. 
 
     Depending on the format of the environment's output, the function might need to do some processing/interpretation of the data.
     For example: If the environment outputs raw sensory data, the function might need to do object recognition to identify relevant objects and their properties.
 
-    The extracted information takes the role of W (the background information) in Horty's formalization of reasoning.
+    (Part of) the extracted information takes the role of W (the background information) in Horty's formalization of reasoning.
 
     Args:
         reason_theory: Set of rules (represented in a graph structure) which encode normatively relevant reasons known to the agent. 
         observation: The raw observational data from the environment.
 
     Returns:
-        information that is normatively relevant (and thus needed to make a decision on how to act while prioritizing normative requirements)
+        information that is normatively or instrumentally relevant (and thus needed to make a decision on how to act while prioritizing normative requirements)
     """
     
     @abstractmethod
@@ -40,7 +40,7 @@ class Data_Processor(ABC):
     """
 
     @abstractmethod
-    def filter_and_prepare(self, data, guiding_rules, observation):
+    def DMM_observation(self, data, guiding_rules, observation):
         pass
     """
     Receives as input: 

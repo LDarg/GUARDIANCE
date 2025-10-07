@@ -15,22 +15,52 @@ class MAT_mapping_PT(MAT_Mapping):
     PRESCHOOL: determining the set of allowed actions for one MAT rule-based hardcoded according to the 1 to 1  mapping
     makes in particular the assumption that for every condition there is at most one child with that condition???
     """
-    def action_conform_with_MAT(self, action, MAT, state):
-        if MAT["type"] == "moral_goal":
-                if state["agent_zone"] == MAT["zone"]:
-                    if action == ("help", config.resolutions[MAT["description"]]):
-                        return True
-                else:
-                    if action == ("move", MAT["zone"]):
-                        return True
-                return False
-        elif MAT["type"] == "moral_constraint":
-            if action  == ("move", MAT["zone"]):
-                return False
-            elif state["agent_zone"] == MAT["zone"]:
-                if action[0] != "move":
+    def violated_obligation(self, action, MAT, observation):
+
+        if MAT[0] == "Stay_out_of_the_zone":
+            #agent plans to not move out of forbidden zone
+            if observation["agent_zone"] == MAT[1]:
+                other_zones = [elem for elem in observation["zone_ids"] if elem != MAT[1]]
+                if not any(action == ("move", other_zone) for other_zone in other_zones):
                     return False
+            #agent plans to move into the forbidden zone
+            if action == ("move", MAT[1]):
+                return False
+        else:
+            child_zone = next(child_condition["zone_id"] for child_condition in observation["child_conditions"] if child_condition["child_id"] == MAT[1])
+            #agent does not move to the zone where the child is
+            if observation["agent_zone"] != child_zone and action != ("move", child_zone):
+                return False
+            elif action != ("help", MAT[1], MAT[0]):
+                return False
+            
         return True
+    
+    """
+    IN GENERAL: execute a default action if the DMM fails to decide on an action that is conform with the guiding rules
+    if it is not possible to simply calculate a default action that is conform with moral goals, the overall agent could be simply instructed to do nothing (or move out of the way if it is a physical system or call for human advisory etc.) to prevent causing harm
+
+    PRESCHOOL: rules for what needs to be done given a certain set of MATs (encode the correct next primitive action for every situation possible)
+    of course this is only possible if there is no epistemic or normative uncertainty and the action space is overseeable which is normally not the case
+    """
+    def default_action(self, MATs, observation):
+        # help the child in need
+        child_in_need  = next(
+            (MAT[1] for MAT in MATs if MAT[0] != "Stay_out_of_the_zone"),
+            None
+        )
+        if child_in_need:
+            child_zone = next(child_condition["zone_id"] for child_condition in observation["child_conditions"] if child_condition["child_id"] == child_in_need)
+            if observation["agent_zone"] != child_zone:
+                return ("move", child_zone)
+         # get out of the forbidden zone
+        else:
+            forbidden_zone = next(
+                (MAT[1] for MAT in MATs if MAT[0] == "Stay_out_of_the_zone"),
+                None
+            )
+            other_zone = next(zone for zone in observation["zone_ids"] if zone != forbidden_zone)
+            return ("move", other_zone)
     
     """
     To determine conflicts (in Horty’s formalization of reasoning), a conformity check of MATs against the first elements of chains of primitive actions takes place here.

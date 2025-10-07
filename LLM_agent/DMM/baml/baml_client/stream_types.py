@@ -39,16 +39,13 @@ class Happening(BaseModel):
     required_MAT: typing.Optional[str] = None
     zone_name: typing.Optional[str] = None
 
+class Obligation(BaseModel):
+    obligation: typing.Optional[typing.Union["Happening", "Child_Condition"]] = None
+
 class Output(BaseModel):
     type: typing.Optional[typing.Union[str, str, str]] = None
     identifier: typing.Optional[str] = None
     help: typing.Optional[str] = None
-
-class Resume(BaseModel):
-    name: typing.Optional[str] = None
-    email: typing.Optional[str] = None
-    experience: typing.List[str]
-    skills: typing.List[str]
 
 class Zone(BaseModel):
     zone_id: typing.Optional[str] = None
