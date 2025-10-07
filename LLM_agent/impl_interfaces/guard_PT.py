@@ -10,24 +10,17 @@ class Guard():
     def ensure_conformity(self, action, guiding_rules, observation):
         MATs = [(rule[0][1],rule[1]) for rule in guiding_rules]
         for MAT in MATs:
-            violated_obligation = self.mat_mapping.violated_obligation(self, action, MAT, observation)  
-            if violated_obligation:  
-                self.inform_overseer(action, violated_obligation)
+            if self.mat_mapping.obligation_violated(action, MAT, observation):  
+                self.inform_overseer(action, MAT)
                 pass
                 #first try to retrigger the DMM
                 #LLM needs a memory before this works
-                    #self.retrigger(action, guiding_rules, observation, DMM_observation)
+                    #action = self.retrigger(action, guiding_rules, observation, DMM_observation)
                 # if retriggering the DMM still does not provide the agent with a useful approach, select a default action and explain to the DMM why it was selected
-                if not self.mat_mapping.action_conform_with_MATs(self, action, MATs, observation):  
-                    action = self.mat_mapping.default_action(self, MATs, observation)
+                if self.mat_mapping.obligation_violated(action, MAT, observation):  
+                    action = self.mat_mapping.default_action( MATs, observation)
                     #tell the LLM why the action was selected
         return action
-
-    def check_conformity(self, action, guiding_rules, observation):
-        MATs = [(rule[0][1],rule[1]) for rule in guiding_rules]
-        if not self.mat_mapping.action_conform_with_MATs(self, action, MATs, observation):  
-            return False
-        return True
     
     """
     GENERAL: inform the human overseer that the DMM wants to execute an action that is nonconform with a binding obligation

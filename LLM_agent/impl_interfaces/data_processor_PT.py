@@ -37,8 +37,9 @@ class Data_Processor_PT(Data_Processor):
             if item[1].replace(" ", "_") in reasons
         }
         relevant_data["agent_zone"] = observation["agent_zone"]
+        
         relevant_data["stations_zones"] = observation["stations_zones"]
-        relevant_data["stations_zones"] = observation["zone_ids"]
+        relevant_data["zone_ids"] = observation["zone_ids"]
 
         self.extracted_information = relevant_data
         
