@@ -4,7 +4,7 @@ from LLM_agent.impl_interfaces.MAT_mapping_PT import MAT_mapping_PT
 from preschool.config import Config
 from LLM_agent.impl_interfaces.data_processor_PT import Data_Processor_PT
 import uuid
-from LLM_agent.impl_interfaces.guard_PT import Guard
+from LLM_agent.impl_interfaces.guard_PT import Guard_PT
 
 """
 An implementation of an RGA (reason-guided agent) with an LLM as DMM (decision-making module).
@@ -16,7 +16,7 @@ class RGA():
         self.mat_mapping = MAT_mapping_PT(self.config)
         self.data_processor = Data_Processor_PT()
         self.reasoning_unit = ReasoningUnit(self.mat_mapping, self.data_processor)
-        self.guard = Guard(self.LLM_interface, self.mat_mapping)
+        self.guard = Guard_PT(self.LLM_interface, self.mat_mapping)
 
     #transforms the output to the format expected as input from the environment 
     def output_to_action(self, LLM_Output):

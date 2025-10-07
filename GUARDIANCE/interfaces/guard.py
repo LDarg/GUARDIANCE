@@ -1,12 +1,6 @@
-from preschool.config import Config
-from LLM_agent.impl_interfaces.MAT_mapping_PT import MAT_mapping_PT
-from GUARDIANCE.interfaces.MAT_mapping import MAT_Mapping
-from GUARDIANCE.interfaces.guard import Guard
+from abc import ABC, abstractmethod
 
-class Guard_PT(Guard):
-    def __init__(self, DMM, mat_mapping:MAT_Mapping):
-        self.DMM = DMM
-        self.mat_mapping = mat_mapping
+class Guard(ABC):
 
     def ensure_conformity(self, action, guiding_rules, observation):
         MATs = [(rule[0][1],rule[1]) for rule in guiding_rules]
@@ -16,7 +10,7 @@ class Guard_PT(Guard):
                 pass
                 #first try to retrigger the DMM
                 #LLM needs a memory before this works
-                    #action =self.retrigger(action, guiding_rules, observation, DMM_observation)
+                    #action = self.retrigger(action, guiding_rules, observation, DMM_observation)
                 # if retriggering the DMM still does not provide the agent with a useful approach, select a default action and explain to the DMM why it was selected
                 if self.mat_mapping.obligation_violated(action, MAT, observation):  
                     action = self.mat_mapping.default_action( MATs, observation)
@@ -24,10 +18,15 @@ class Guard_PT(Guard):
         return action
     
     """
-    GENERAL: inform the human overseer that the DMM wants to execute an action that is nonconform with a binding obligation
+    inform the human overseer that the DMM wants to execute an action that is nonconform with a binding obligation
     """
+    @abstractmethod
     def inform_overseer(self, action, violated_obligation):
         pass
 
+    """
+    inform the DMM about the noncomformity of its action with a guiding rule and request another action
+    """
+    @abstractmethod
     def retrigger(self, action, violated_obligation):
-        self.DMM.Rethink_Choice_Of_Action(action=action, obligation=violated_obligation)
+        pass

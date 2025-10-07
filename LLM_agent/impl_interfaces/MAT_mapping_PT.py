@@ -68,18 +68,18 @@ class MAT_mapping_PT(MAT_Mapping):
         forbidden_zones = []
         for rule in set_of_rules:
             if rule[0][1] == "Stay_out_of_the_zone":
-                forbidden_zones += [extracted_data["zones"][id]["zone_name"] for id in extracted_data["zones"] if id == rule[1]]
-        if 'A' in forbidden_zones and 'B' in forbidden_zones:
+                forbidden_zones += [zone for zone in extracted_data["zones"] if zone == rule[1]]
+        if len(forbidden_zones) >= 2:
             return True
         
         required_action = None
         for rule in set_of_rules:
             if rule[0][1] != "Stay_out_of_the_zone":
-                child_zone = extracted_data["children"][rule[1]]["zone_name"] 
-                if child_zone in forbidden_zones:
+                child_zone_id = extracted_data["children"][rule[1]]["zone_id"] 
+                if child_zone_id in forbidden_zones:
                     return True
-                elif child_zone != extracted_data["agent_zone"]:
-                    required_action_rule = ("move", child_zone)
+                elif child_zone_id != extracted_data["agent_zone"]:
+                    required_action_rule = ("move", child_zone_id)
                 else:
                     required_action_rule = ("help", rule[0][1])
 
@@ -88,6 +88,7 @@ class MAT_mapping_PT(MAT_Mapping):
                 else:
                     required_action = required_action_rule
         return False
+    
     
                     
 
