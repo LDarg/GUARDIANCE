@@ -53,6 +53,28 @@ class Data_Processor_PT(Data_Processor):
             groundings.add(((truthmaker[1]["description"], resolution), truthmaker[0]))
         return groundings
     
+    def filter_and_prepare(self, data, guiding_rules, observation):
+
+        child_conditions = [{"child_id": str(data["children"][rule[1]]["child_id"]),
+                             "reason": rule[0][0],
+                             "required_MAT": rule[0][1],
+                             "zone_name": data["children"][rule[1]]["zone_name"],
+                             "zone_id": str(data["children"][rule[1]]["zone_id"])}
+                            for rule in guiding_rules if rule[0][0] in [child["description"] for child in data["children"].values()]]
+        
+        happenings = [{"zone_id": str(data["zones"][rule[1]]["zone_id"]),
+                          "reason": rule[0][0],
+                          "required_MAT": rule[0][1],
+                          "zone_name": data["zones"][rule[1]]["zone_name"]}
+                       for rule in guiding_rules if rule[0][0] in [zone["description"] for zone in data["zones"].values()]]
+
+        DMM_input = {"child_conditions": child_conditions, "happenings": happenings}
+        DMM_input["stations_zones"] = data["stations_zones"]
+        DMM_input["agent_zone"] = {"zone_id": str(data["agent_zone"])}
+        DMM_input["zone_ids"] = [{"zone_id": str(zone_id)} for zone_id in observation["zone_ids"]]
+        
+        return DMM_input
+    
     """
     all data is passed to the DMM; no filtering is applied.
     """
