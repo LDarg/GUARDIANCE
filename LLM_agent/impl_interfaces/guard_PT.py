@@ -1,5 +1,3 @@
-from preschool.config import Config
-from LLM_agent.impl_interfaces.MAT_mapping_PT import MAT_mapping_PT
 from GUARDIANCE.interfaces.MAT_mapping import MAT_Mapping
 from GUARDIANCE.interfaces.guard import Guard
 
@@ -12,7 +10,7 @@ class Guard_PT(Guard):
         MATs = [(rule[0][1],rule[1]) for rule in guiding_rules]
         for MAT in MATs:
             if self.mat_mapping.obligation_violated(action, MAT, observation):  
-                self.inform_overseer(action, MAT)
+                self.inform_human(action, MAT)
                 pass
                 #first try to retrigger the DMM
                 #LLM needs a memory before this works
@@ -23,10 +21,7 @@ class Guard_PT(Guard):
                     #tell the LLM why the action was selected
         return action
     
-    """
-    GENERAL: inform the human overseer that the DMM wants to execute an action that is nonconform with a binding obligation
-    """
-    def inform_overseer(self, action, violated_obligation):
+    def inform_human(self, action, violated_obligation):
         pass
 
     def retrigger(self, action, violated_obligation):

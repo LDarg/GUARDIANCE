@@ -31,11 +31,12 @@ class MAT_Mapping(ABC):
             bool: True if the conclusions in the set of rules are conflicted, False otherwise.
         """
 
-    """
-    execute a default action if the DMM fails to decide on an action that is conform with the guiding rules
-    if it is not possible to simply calculate a default action that is conform with moral goals, the overall agent could be simply instructed to do nothing (or move out of the way if it is a physical system or call for human advisory etc.) to prevent causing harm
-    """
+    @abstractmethod
     def default_action(self, MATs, observation):
-        pass
+         pass
+         """
+         execute a default action if the DMM fails to decide on an action that is conform with the guiding rules
+         if it is not possible to simply calculate a default action that is conform with moral goals, the overall agent could be simply instructed to do nothing (or move out of the way if it is a physical system or call for human advisory etc.) to prevent causing harm
+         """
 
 

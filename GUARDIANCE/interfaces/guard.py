@@ -6,7 +6,7 @@ class Guard(ABC):
         MATs = [(rule[0][1],rule[1]) for rule in guiding_rules]
         for MAT in MATs:
             if self.mat_mapping.obligation_violated(action, MAT, observation):  
-                self.inform_overseer(action, MAT)
+                self.inform_human(action, MAT)
                 pass
                 #first try to retrigger the DMM
                 #LLM needs a memory before this works
@@ -18,10 +18,10 @@ class Guard(ABC):
         return action
     
     """
-    inform the human overseer that the DMM wants to execute an action that is nonconform with a binding obligation
+    inform the human human that the DMM wants to execute an action that is nonconform with a binding obligation
     """
     @abstractmethod
-    def inform_overseer(self, action, violated_obligation):
+    def inform_human(self, action, violated_obligation):
         pass
 
     """

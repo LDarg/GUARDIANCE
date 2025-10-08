@@ -14,7 +14,6 @@ class MAT_mapping_PT(MAT_Mapping):
 
     """
     PRESCHOOL: determining the set of allowed actions for one MAT rule-based hardcoded according to the 1 to 1  mapping
-    makes in particular the assumption that for every condition there is at most one child with that condition???
     """
     def obligation_violated(self, action, MAT, observation):
 
