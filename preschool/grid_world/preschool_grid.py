@@ -136,11 +136,11 @@ class Preschool_Grid(gym.Env):
         the observation is a one hot encoding of the agent position, the person positions and the water tiles flattened to a 1d vector (np.array)
         """
         self.size = self.map.width * self.map.height
-        grid_width = self.map.width   # number of columns in the grid
-        grid_height = self.map.height   # number of rows in the grid
+        self.grid_width = self.map.width   # number of columns in the grid
+        self.grid_height = self.map.height   # number of rows in the grid
         len_obs_dict = len(self.get_obs_dict())
-        total_grid_cells = self.map.width  * self.map.height
-        observation_size = len_obs_dict * total_grid_cells
+        self.total_grid_cells = self.map.width  * self.map.height
+        observation_size = len_obs_dict * self.total_grid_cells
         self.observation_space = spaces.Box(
             low=0,
             high=1,
@@ -175,8 +175,8 @@ class Preschool_Grid(gym.Env):
         """
         cell_width = 100  # width of each cell in pixels
         cell_height = 100  # height of each cell in pixels
-        self.navigation_area_width = grid_width * cell_width 
-        self.navigation_area_height = grid_height * cell_height 
+        self.navigation_area_width = self.grid_width * cell_width 
+        self.navigation_area_height = self.grid_height * cell_height 
         self.render_mode = render_mode
         self.window = None
         self.clock = None
@@ -205,11 +205,8 @@ class Preschool_Grid(gym.Env):
         return np.array(nn_input.astype(np.float32))
     
     def get_obs_dict(self):
-        grid_width = self.map.width
-        grid_height = self.map.height  
-
         # agent's position (one-hot encoding)
-        agent_window = np.zeros((grid_height, grid_width))
+        agent_window = np.zeros((self.map.height, self.map.width))
         agent_x, agent_y = self.agent_coordinates
         agent_window[agent_x, agent_y] = 1
 
@@ -268,6 +265,7 @@ class Preschool_Grid(gym.Env):
         self.render()
 
         return observation, info
+        
     
     def initialize_at_reset(self, random_gen):
         self.map = Map(random_gen, self.config)
@@ -328,8 +326,22 @@ class Preschool_Grid(gym.Env):
     
     def render(self):
         if self.render_mode == "human":
-         return self.render_frame()
-        
+            canvas = self.render_frame()
+            self.handle_events()
+            self.window.blit(canvas, (0, 0))
+            self.update_display()
+
+    def handle_events(self):
+        for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.close()
+                    pygame.quit()
+                    sys.exit()
+
+    def update_display(self):
+        pygame.display.flip()
+        self.clock.tick(self.metadata["render_fps"])
+
     def close(self):
         if self.window is not None:
             pygame.display.quit()
@@ -382,14 +394,15 @@ class Preschool_Grid(gym.Env):
         # --- children + agent ---
         agent_pos = ((self.agent_coordinates + 0.5) * np.array([pix_width_size, pix_height_size])).astype(int)
         smaller_radius = int(min(pix_width_size, pix_height_size) / 6)
-        color_children = (0, 0, 0)
+        color_children = (255, 165, 0)
+        color_agent= (0, 0, 0)
 
         for child in self.map.children:
             if np.array_equal(self.agent_coordinates, child.coordinates):
                 left_pos = (agent_pos - np.array([smaller_radius, 0])).astype(int)
                 right_pos = (agent_pos + np.array([smaller_radius, 0])).astype(int)
                 #canvas.blit(resource_manager.child_icon, (left_pos, right_pos))
-                pygame.draw.circle(canvas, (255, 255, 255), tuple(left_pos), smaller_radius)
+                pygame.draw.circle(canvas, color_agent, tuple(left_pos), smaller_radius)
                 pygame.draw.circle(canvas, color_children, tuple(right_pos), smaller_radius)
             else:
                 child_pos = ((child.coordinates + 0.5) * np.array([pix_width_size, pix_height_size])).astype(int)
@@ -397,7 +410,7 @@ class Preschool_Grid(gym.Env):
                 pygame.draw.circle(canvas, color_children, tuple(child_pos), int(min(pix_width_size, pix_height_size) / 3))
 
         if not any(np.array_equal(self.agent_coordinates, child.coordinates) for child in self.map.children):
-            pygame.draw.circle(canvas, (255, 255, 255), tuple(agent_pos), int(min(pix_width_size, pix_height_size) / 3))
+            pygame.draw.circle(canvas, color_agent, tuple(agent_pos), int(min(pix_width_size, pix_height_size) / 3))
 
         # --- learning stations ---
         for learning_station in self.map.learning_stations:
@@ -442,14 +455,6 @@ class Preschool_Grid(gym.Env):
             y_offset += text_surface.get_height() + 5
 
         # Blit grid to window
-        self.window.blit(canvas, (0, 0))
+        #self.window.blit(canvas, (0, 0))
+        return canvas
 
-        for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    self.close()
-                    pygame.quit()
-                    sys.exit()
-
-        # Update display
-        pygame.display.flip()
-        self.clock.tick(self.metadata["render_fps"])

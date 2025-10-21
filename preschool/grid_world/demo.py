@@ -3,6 +3,7 @@ import gymnasium as gym
 import argparse
 import ast
 from preschool.grid_world.preschool_grid import Preschool_Grid
+from preschool.grid_world.rand_target import Rand_Target
 
 """
 Visualizes an instance of the bridge environment with random actions, printing the action, reward, and state at each step.
@@ -22,7 +23,7 @@ def demo(env):
         truncated = False
 
         while not terminated and not truncated:
-            env.render()
+            #env.render()
             # randomly choose an action
             action = env.action_space.sample()
             state, reward, terminated, truncated, _ = env.step(action)
@@ -38,4 +39,5 @@ if __name__ == '__main__':
             max_episode_steps=100,
         )
     env = gym.make("Preschool-v0")
+    env = Rand_Target(env)
     demo(env)
