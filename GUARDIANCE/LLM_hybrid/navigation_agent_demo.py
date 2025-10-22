@@ -26,17 +26,6 @@ def visualize(agent, env, seed=None):
                      pass        
 
 if __name__ == '__main__':
-    env_id = 'Preschool-v0'
-    if env_id not in gym.envs.registry:
-        gym.register(
-            id=env_id,
-            entry_point='preschool.grid_world.preschool_grid:Preschool_Grid',
-            max_episode_steps=100,
-        )
-    env = gym.make(env_id)
-    env = Rand_Target(env)
-    env = PrescCoordinates(env)
-
-    agent_name = "navigation_agent_2000_episodes"
-    agent= setup_agent(agent_name)
+    agent_name = "navigation_agent_600_episodes"
+    agent,env= setup_agent(agent_name)
     visualize(agent=agent, env=env)

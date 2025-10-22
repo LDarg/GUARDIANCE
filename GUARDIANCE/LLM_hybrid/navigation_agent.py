@@ -8,9 +8,8 @@ import logging
 from torch import nn
 import os
 import gymnasium as gym
-from preschool.grid_world.rand_target import Rand_Target, PrescCoordinates
+from preschool.grid_world.rand_target import Rand_Target, PrescCoordinates, Extended
 import sys
-
 
 logger = logging.getLogger(__name__)
 
@@ -25,44 +24,26 @@ def load_modules(agent, agent_info):
     agent.target_dqn.load_state_dict(agent_info["target_state_dict"])
 
 def setup_agent(agent_name):
-    #agent_info = get_agent_info(agent_name)
-    env_id = 'Preschool-v0'
-    if env_id not in gym.envs.registry:
-        gym.register(
-            id=env_id,
-            entry_point='preschool.grid_world.preschool_grid:Preschool_Grid',
-            max_episode_steps=100,
-        )
-    env = gym.make(env_id)
-    env = Rand_Target(env)
-    env = PrescCoordinates(env)
+    agent_info = get_agent_info(agent_name)
+    env = agent_info["env"]
     agent = RL_agent(env)
-    #load_modules(agent, agent_info)
-    dir_name = get_dir_name()
-    file_path = os.path.join(dir_name, agent_name + ".pth")
-    agent.policy_dqn.load_state_dict(torch.load(file_path))
-    for param in agent.policy_dqn.parameters():
-        print(param)
-    return agent
-    #return agent, env
+    load_modules(agent, agent_info)
+    return (agent, env)
 
 def get_dir_name():
     current_file_dir = os.path.dirname(os.path.abspath(__file__)) 
-    return os.path.join(current_file_dir, 'agents')
+    return os.path.join(current_file_dir, 'RL_agents')
 
 def save_agent(agent, agent_name):
-    #save_dict = {
-    #    "policy_state_dict": agent.policy_dqn.state_dict(),
-    #    "target_state_dict": agent.target_dqn.state_dict(),
-    #    # Remove the environment object from saved state
-    #    # Optionally save env config params here if needed
-    #}
+    
+    save_dict = {
+        "policy_state_dict": agent.policy_dqn.state_dict(),
+        "target_state_dict": agent.target_dqn.state_dict(),
+        "env": agent.env
+    }
     dir_name = get_dir_name()
     file_path= os.path.join(dir_name, agent_name + ".pth")
-    for param in agent.policy_dqn.parameters():
-        print(param)
-    torch.save(agent.policy_dqn.state_dict(), file_path)
-    #torch.save(save_dict, file_path)
+    torch.save(save_dict, file_path)
     logger.info(f"Agent saved to {file_path}")
 
 class RL_agent:
@@ -168,14 +149,6 @@ class RL_agent:
 
         plot_training_progress(sum_rewards, agent_name)
 
-    def HER_transformation(self, observation,reward,terminated,truncated, info):
-        if truncated:
-            # Calculate the midpoint (assuming even length)
-            mid = len(observation) // 2
-            # Copy second half to first half
-            observation[:mid] = observation[mid:]
-            reward = 100
-
 
     def optimize(self, mini_batch):
 
@@ -250,7 +223,6 @@ def visualize(agent, env, seed=None):
                      pass     
 
 if __name__ == "__main__":
-    env_id = 'Preschool-v0'
 
     logger.setLevel(logging.INFO)
     stream_handler = logging.StreamHandler(sys.stdout)
@@ -265,6 +237,8 @@ if __name__ == "__main__":
 
     logger.info("Logger configured to output to terminal")
 
+    env_id = 'Preschool-v0'
+
     if env_id not in gym.envs.registry:
         gym.register(
             id=env_id,
@@ -273,10 +247,10 @@ if __name__ == "__main__":
         )
     env = gym.make(env_id)
     env = Rand_Target(env)
-    env = PrescCoordinates(env)
+    env = Extended(env)
     agent = RL_agent(env)
 
-    training_episodes = 2000
+    training_episodes = 800
     train_navigation_policy = agent.train_navigation_policy(env=env, episodes=training_episodes, name=f"navigation_agent_{training_episodes}_episodes", pb=True)
     for param in agent.policy_dqn.parameters():
         print(param)

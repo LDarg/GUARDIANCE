@@ -142,6 +142,8 @@ class PrescFlattened(gym.ObservationWrapper):
         return obs
     
 
+def manhattan_distance(a, b):
+    return abs(a[0] - b[0]) + abs(a[1] - b[1])
 class Extended(gym.ObservationWrapper):
     def __init__(self, env):
             super().__init__(env)
@@ -149,12 +151,9 @@ class Extended(gym.ObservationWrapper):
             self.observation_space = spaces.Box(
                 low=0,
                 high=1,
-                shape=(7,),
+                shape=(3,),
                 dtype=np.float32
             )
-
-    def manhattan_distance(a, b):
-        return abs(a[0] - b[0]) + abs(a[1] - b[1])
 
     def observation(self, observation):
         agent_x, agent_y = self.env.agent_coordinates
@@ -176,7 +175,7 @@ class Extended(gym.ObservationWrapper):
         elif dr == 0 and dc > 0:
             compass_direction = 2  # East
 
-        distance = self._manhattan_distance(self.env.agent_coordinates, self.env.target_position) / (2 * 16)
+        distance = manhattan_distance(self.env.agent_coordinates, self.env.target_position) / (2 * 16)
 
         at_edge = (
 
@@ -186,5 +185,5 @@ class Extended(gym.ObservationWrapper):
 
         )
 
-        obs = np.array([agent_flat, goal_flat, compass_direction, distance, at_edge])
+        obs = np.array([compass_direction, distance, at_edge])
         return obs
