@@ -37,6 +37,6 @@ if __name__ == '__main__':
     env = Rand_Target(env)
     env = PrescCoordinates(env)
 
-    agent_name = "navigation_agent_1_episodes"
+    agent_name = "navigation_agent_2000_episodes"
     agent= setup_agent(agent_name)
     visualize(agent=agent, env=env)

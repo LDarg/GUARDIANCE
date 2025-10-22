@@ -58,8 +58,6 @@ class Rand_Target(gym.Wrapper):
             self.target_position = self.env.map.random_location()
             while np.equal(self.env.agent_coordinates, self.target_position).all():
                 self.target_position = self.env.map.random_location()
-            #TODO: only set to fixed point for testing the RL algorithm
-            self.target_position = np.array([0,0])
             observation, info= super().reset(seed=seed, options=options)
             self.render_mode_setting = self.env.render_mode
             self.render()
@@ -116,13 +114,11 @@ class PrescCoordinates(gym.ObservationWrapper):
             self.observation_space = spaces.Box(
                 low=0,
                 high=1,
-                #shape=(4,),
-                shape=(2,),
+                shape=(4,),
                 dtype=np.float32
             )
 
     def observation(self, observation):
-         return np.array([self.env.agent_coordinates[0], self.agent_coordinates[1]])
          return np.array([self.env.agent_coordinates[0], self.agent_coordinates[1], self.target_position[0], self.target_position[1]])
 
     
