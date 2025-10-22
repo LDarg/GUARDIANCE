@@ -56,6 +56,10 @@ class Rand_Target(gym.Wrapper):
         
         def reset(self, seed=None, options=None):
             self.target_position = self.env.map.random_location()
+            while np.equal(self.env.agent_coordinates, self.target_position).all():
+                self.target_position = self.env.map.random_location()
+            #TODO: only set to fixed point for testing the RL algorithm
+            self.target_position = np.array([0,0])
             observation, info= super().reset(seed=seed, options=options)
             self.render_mode_setting = self.env.render_mode
             self.render()
@@ -74,7 +78,6 @@ class Rand_Target(gym.Wrapper):
                 self.env.handle_events()
                 self.window.blit(canvas, (0, 0))
                 self.env.update_display()
-
         
         def step(self, action):
             self.env.set_render_mode(None)
@@ -82,10 +85,11 @@ class Rand_Target(gym.Wrapper):
             self.env.set_render_mode(self.render_mode_setting)
             self.render()
             if np.equal(self.env.agent_coordinates, self.target_position).all():
-                reward = 100
+                reward = 1
+                terminated = True
             self.steps_counter += 1
-            if self.steps_counter >= self.max_steps:
-                truncated = True
+            #if self.steps_counter >= self.max_steps:
+            #    truncated = True
             observation = self.observation()
             info = self.get_obs_dict()
             return observation,reward,terminated,truncated,info
@@ -103,3 +107,88 @@ class Rand_Target(gym.Wrapper):
                 ),
             )
             return canvas
+        
+
+class PrescCoordinates(gym.ObservationWrapper):
+    def __init__(self, env):
+            super().__init__(env)
+
+            self.observation_space = spaces.Box(
+                low=0,
+                high=1,
+                #shape=(4,),
+                shape=(2,),
+                dtype=np.float32
+            )
+
+    def observation(self, observation):
+         return np.array([self.env.agent_coordinates[0], self.agent_coordinates[1]])
+         return np.array([self.env.agent_coordinates[0], self.agent_coordinates[1], self.target_position[0], self.target_position[1]])
+
+    
+class PrescFlattened(gym.ObservationWrapper):
+    def __init__(self, env):
+            super().__init__(env)
+
+            self.observation_space = spaces.Box(
+                low=0,
+                high=1,
+                shape=(2,),
+                dtype=np.float32
+            )
+
+    def observation(self, observation):
+        agent_x, agent_y = self.env.agent_coordinates
+        goal_x, goal_y = self.env.target_position
+        agent_flat = agent_y * self.env.map.width + agent_x
+        goal_flat = goal_y * self.env.map.width + goal_x
+        obs = np.array([agent_flat, goal_flat])
+        return obs
+    
+
+class Extended(gym.ObservationWrapper):
+    def __init__(self, env):
+            super().__init__(env)
+
+            self.observation_space = spaces.Box(
+                low=0,
+                high=1,
+                shape=(7,),
+                dtype=np.float32
+            )
+
+    def manhattan_distance(a, b):
+        return abs(a[0] - b[0]) + abs(a[1] - b[1])
+
+    def observation(self, observation):
+        agent_x, agent_y = self.env.agent_coordinates
+        goal_x, goal_y = self.env.target_position
+        agent_flat = agent_y * self.env.map.width + agent_x
+        goal_flat = goal_y * self.env.map.width + goal_x
+
+        dr = goal_y - agent_y
+
+        dc = goal_x - agent_x
+
+        compass_direction = -1
+        if dr < 0 and dc == 0:
+            compass_direction = 0  # North
+
+        elif dr < 0 and dc > 0:
+            compass_direction = 1  # Northeast
+
+        elif dr == 0 and dc > 0:
+            compass_direction = 2  # East
+
+        distance = self._manhattan_distance(self.env.agent_coordinates, self.env.target_position) / (2 * 16)
+
+        at_edge = (
+
+            agent_y == 0 or agent_y == self.env.map.width - 1 or
+
+            agent_x == 0 or agent_x == self.env.map.height - 1
+
+        )
+
+        obs = np.array([agent_flat, goal_flat, compass_direction, distance, at_edge])
+        return obs

@@ -2,6 +2,9 @@ from abc import ABC, abstractmethod
 
 class Guard(ABC):
 
+    """
+    the actions might be from the action space of the environment or decisions made on a higher level of abstraction as decided as part of the reasoning of an LLM-powerd DMM 
+    """
     def ensure_conformity(self, action, guiding_rules, observation):
         MATs = [(rule[0][1],rule[1]) for rule in guiding_rules]
         for MAT in MATs:

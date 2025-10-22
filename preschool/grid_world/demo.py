@@ -3,7 +3,7 @@ import gymnasium as gym
 import argparse
 import ast
 from preschool.grid_world.preschool_grid import Preschool_Grid
-from preschool.grid_world.rand_target import Rand_Target
+from preschool.grid_world.rand_target import Rand_Target, PrescCoordinates
 
 """
 Visualizes an instance of the bridge environment with random actions, printing the action, reward, and state at each step.
@@ -40,4 +40,5 @@ if __name__ == '__main__':
         )
     env = gym.make("Preschool-v0")
     env = Rand_Target(env)
+    env = PrescCoordinates(env)
     demo(env)

@@ -8,14 +8,15 @@ import logging
 from torch import nn
 import os
 import gymnasium as gym
-from preschool.grid_world.rand_target import Rand_Target
+from preschool.grid_world.rand_target import Rand_Target, PrescCoordinates
+import sys
 
 
 logger = logging.getLogger(__name__)
 
 def get_agent_info(agent_name):
     dir_name = get_dir_name()
-    file_path= os.path.join(os.path.dirname(os.path.abspath(__file__)), "agent")
+    file_path = os.path.join(dir_name, agent_name + ".pth")
     agent_info = torch.load(file_path)
     return agent_info
 
@@ -24,26 +25,44 @@ def load_modules(agent, agent_info):
     agent.target_dqn.load_state_dict(agent_info["target_state_dict"])
 
 def setup_agent(agent_name):
-    agent_info = get_agent_info(agent_name)
-    env = agent_info["env"]
+    #agent_info = get_agent_info(agent_name)
+    env_id = 'Preschool-v0'
+    if env_id not in gym.envs.registry:
+        gym.register(
+            id=env_id,
+            entry_point='preschool.grid_world.preschool_grid:Preschool_Grid',
+            max_episode_steps=100,
+        )
+    env = gym.make(env_id)
+    env = Rand_Target(env)
+    env = PrescCoordinates(env)
     agent = RL_agent(env)
-    load_modules(agent, agent_info)
-    return (agent, env)
+    #load_modules(agent, agent_info)
+    dir_name = get_dir_name()
+    file_path = os.path.join(dir_name, agent_name + ".pth")
+    agent.policy_dqn.load_state_dict(torch.load(file_path))
+    for param in agent.policy_dqn.parameters():
+        print(param)
+    return agent
+    #return agent, env
 
 def get_dir_name():
     current_file_dir = os.path.dirname(os.path.abspath(__file__)) 
-    return os.path.join(current_file_dir, 'navigation_agents')
+    return os.path.join(current_file_dir, 'agents')
 
 def save_agent(agent, agent_name):
-    
-    save_dict = {
-        "policy_state_dict": agent.policy_dqn.state_dict(),
-        "target_state_dict": agent.target_dqn.state_dict(),
-        "env": agent.env
-    }
+    #save_dict = {
+    #    "policy_state_dict": agent.policy_dqn.state_dict(),
+    #    "target_state_dict": agent.target_dqn.state_dict(),
+    #    # Remove the environment object from saved state
+    #    # Optionally save env config params here if needed
+    #}
     dir_name = get_dir_name()
-    file_path= os.path.join(os.path.dirname(os.path.abspath(__file__)), "agent")
-    torch.save(save_dict, file_path)
+    file_path= os.path.join(dir_name, agent_name + ".pth")
+    for param in agent.policy_dqn.parameters():
+        print(param)
+    torch.save(agent.policy_dqn.state_dict(), file_path)
+    #torch.save(save_dict, file_path)
     logger.info(f"Agent saved to {file_path}")
 
 class RL_agent:
@@ -76,7 +95,7 @@ class RL_agent:
             env = self.env
         
         epsilon = 1 # 0: no randomness; 1:completely random
-        k = 5 # decay rate for epsilon
+        k = 3 # decay rate for epsilon
         memory = drl.ReplayMemory(self.replay_memory_size)
 
         # initially sync the policy and the target network (same parameters)
@@ -103,7 +122,7 @@ class RL_agent:
                 # select action epsilon-greedy
                 if random.random() < epsilon:
                     # select random action
-                    action = env.action_space.sample() # actions: 0=left,1=down,2=right,3=up, 4:save, 5:idle
+                    action = env.action_space.sample() # actions: 0=left,1=down,2=right,3=up, 4:help child
                 else:
                     # select best action            
                     with torch.no_grad():
@@ -115,13 +134,16 @@ class RL_agent:
 
                 #self.HER_transformation(new_state,reward,terminated,truncated, info)
                 # add sample to memory
-                memory.append((state, action, new_state, reward, terminated)) 
+                memory.append((state, action, new_state, reward, terminated, truncated)) 
 
                 # update the state
                 state = new_state
 
                 # increment counter for synching the target network with the policy network
                 step_count+=1
+
+                if reward != 0:
+                    pass
 
                 # update the policy network
                 if len(memory)>self.mini_batch_size: 
@@ -160,9 +182,9 @@ class RL_agent:
         current_q_list = []
         target_q_list = []
 
-        for state, action, new_state, reward, terminated in mini_batch:
+        for state, action, new_state, reward, terminated, truncated in mini_batch:
 
-            if terminated: 
+            if terminated or truncated: 
                 target = torch.FloatTensor([reward])
             else:
                 with torch.no_grad():
@@ -190,9 +212,8 @@ class RL_agent:
     def train_navigation_policy(self, env, episodes, name, pb=True):
         if not env:
             env = self.env
-        net = RL_agent(env)
         self.train(episodes, name, env, pb=pb)
-        save_agent(net, name)
+        save_agent(self, name)
 
     def land_tiles_next_to_person(env, coordinates):
         directions = env.directions
@@ -203,9 +224,46 @@ class RL_agent:
                     if env.bridge_map.get_grid_type(neighbor) != env.bridge_map.grid_types["water"]:
                         land_tiles_next_to_person.append(neighbor)
         return land_tiles_next_to_person
+    
+def visualize(agent, env, seed=None):
+
+        env.set_render_mode('human')
+        agent.policy_dqn.eval()  
+        
+        #state, _ = env.reset()
+
+        while True:
+            state, _ = env.reset()
+            terminated = False     
+            truncated = False       
+            #obeservation = env.observation()   
+
+            while(not terminated and not truncated):
+                obs = env.get_obs_dict() 
+                # select morally permissible action  
+                with torch.no_grad():
+                    # actions: 0=left,1=down,2=right,3=up
+                    action_preferences = [tensor.item() for tensor in agent.policy_dqn(agent.transformation(state))]
+                    action = action_preferences.index(max(action_preferences))  
+                state,reward,terminated,truncated,_ = env.step(action)  
+                if reward != 0:
+                     pass     
 
 if __name__ == "__main__":
     env_id = 'Preschool-v0'
+
+    logger.setLevel(logging.INFO)
+    stream_handler = logging.StreamHandler(sys.stdout)
+    stream_handler.setLevel(logging.INFO)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    stream_handler.setFormatter(formatter)
+
+    root_logger = logging.getLogger()
+    root_logger.setLevel(logging.INFO)
+    if not any(isinstance(h, logging.StreamHandler) and getattr(h, "stream", None) is sys.stdout for h in root_logger.handlers):
+        root_logger.addHandler(stream_handler)
+
+    logger.info("Logger configured to output to terminal")
 
     if env_id not in gym.envs.registry:
         gym.register(
@@ -213,11 +271,15 @@ if __name__ == "__main__":
             entry_point='preschool.grid_world.preschool_grid:Preschool_Grid',
             max_episode_steps=100,
         )
-    env = gym.make("Preschool-v0")
+    env = gym.make(env_id)
     env = Rand_Target(env)
+    env = PrescCoordinates(env)
     agent = RL_agent(env)
 
-    training_episodes = 10000
+    training_episodes = 2000
     train_navigation_policy = agent.train_navigation_policy(env=env, episodes=training_episodes, name=f"navigation_agent_{training_episodes}_episodes", pb=True)
+    for param in agent.policy_dqn.parameters():
+        print(param)
+    visualize(agent, env)
 
 
