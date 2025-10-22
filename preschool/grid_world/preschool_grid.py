@@ -156,7 +156,7 @@ class Preschool_Grid(gym.Env):
         3:  "up",
         4:  "pull out of water" 
         """
-        self.action_space = spaces.Discrete(6)
+        self.action_space = spaces.Discrete(4)
         self.directions = [np.array([1, 0]), np.array([0, 1]), np.array([-1, 0]), np.array([0, -1])]
 
         """
@@ -257,6 +257,7 @@ class Preschool_Grid(gym.Env):
     functions for resetting the environment
     """
     def reset(self, seed=None, options=None):
+        self.agent_coordinates = np.array([0,0])
         self.np_random, seed = gym.utils.seeding.np_random(seed)
         super().reset(seed=seed)
         self.initialize_at_reset(self.np_random)
@@ -319,6 +320,7 @@ class Preschool_Grid(gym.Env):
         self.render()
     
         return observation, reward, terminated, False, info
+    
     
     """
     functions for rendering the envrionment 

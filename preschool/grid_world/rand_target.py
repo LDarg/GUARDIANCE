@@ -21,6 +21,9 @@ class Rand_Target(gym.Wrapper):
                 dtype=np.float32
             )
 
+            #modify this to as a hyperparameter for GCRL with HER
+            self.max_steps = 20
+
         def observation(self):
             obs_dict = self.get_obs_dict()
 
@@ -38,16 +41,16 @@ class Rand_Target(gym.Wrapper):
             # agent's position (one-hot encoding)
             agent_window = np.zeros((self.env.grid_height, self.env.grid_width))
             agent_x, agent_y = self.agent_coordinates
-            agent_window[agent_x, agent_y] = 1
+            agent_window[agent_y, agent_x] = 1
 
             # target position (one-hot encoding)
             target_window = np.zeros((self.env.grid_height, self.env.grid_width))
             target_x, target_y = self.target_position
-            target_window[target_x, target_y] = 1
+            target_window[target_y, target_x] = 1
 
             observation = {
                 "agent_window": agent_window,
-                "target_window": self.target_position
+                "target_window": target_window
             }
             return observation
         
@@ -56,6 +59,8 @@ class Rand_Target(gym.Wrapper):
             observation, info= super().reset(seed=seed, options=options)
             self.render_mode_setting = self.env.render_mode
             self.render()
+            self.steps_counter = 0
+            observation = self.observation()
             return observation, info
         
         def set_render_mode(self, render_mode):
@@ -76,6 +81,13 @@ class Rand_Target(gym.Wrapper):
             observation,reward,terminated,truncated,info = super().step(action)
             self.env.set_render_mode(self.render_mode_setting)
             self.render()
+            if np.equal(self.env.agent_coordinates, self.target_position).all():
+                reward = 100
+            self.steps_counter += 1
+            if self.steps_counter >= self.max_steps:
+                truncated = True
+            observation = self.observation()
+            info = self.get_obs_dict()
             return observation,reward,terminated,truncated,info
 
         def render_target_position(self, canvas):
