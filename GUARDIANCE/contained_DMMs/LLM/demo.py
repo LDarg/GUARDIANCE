@@ -1,7 +1,7 @@
-from LLM_agent.RGA import RGA
+from GUARDIANCE.contained_DMMs.LLM.contained_LLM_PT import contained_LLM_PT
 from preschool.text_description.preschool_text import Preschool_Text
 import gymnasium as gym
-from LLM_agent.utils.rules import set_rules
+from preschool.rule_sets.rules import set_rules
 import logging
 
 logger = logging.getLogger(__name__)
@@ -29,7 +29,7 @@ def navigate(env, agent):
 
 
 # set up environment and agent
-agent = RGA()
+agent = contained_LLM_PT()
 env_id = 'Preschool-v0'
 if env_id not in gym.envs.registry:
     gym.register(

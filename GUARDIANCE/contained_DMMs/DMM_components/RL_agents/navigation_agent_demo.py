@@ -26,6 +26,6 @@ def visualize(agent, env, seed=None):
                      pass        
 
 if __name__ == '__main__':
-    agent_name = "navigation_agent_600_episodes"
+    agent_name = "navigation_agent_700_episodes"
     agent,env= setup_agent(agent_name)
     visualize(agent=agent, env=env)

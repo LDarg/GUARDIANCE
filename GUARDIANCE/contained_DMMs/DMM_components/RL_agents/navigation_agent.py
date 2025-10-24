@@ -32,7 +32,7 @@ def setup_agent(agent_name):
 
 def get_dir_name():
     current_file_dir = os.path.dirname(os.path.abspath(__file__)) 
-    return os.path.join(current_file_dir, 'RL_agents')
+    return os.path.join(current_file_dir, 'trained_models')
 
 def save_agent(agent, agent_name):
     

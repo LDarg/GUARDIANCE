@@ -1,15 +1,15 @@
-from LLM_agent.DMM.baml.baml_client import b
 from GUARDIANCE.reasoning_unit import ReasoningUnit
-from LLM_agent.impl_interfaces.MAT_mapping_PT import MAT_mapping_PT
+from GUARDIANCE.contained_DMMs.LLM.impl_interfaces.MAT_mapping_PT import MAT_mapping_PT
 from preschool.config import Config
-from LLM_agent.impl_interfaces.data_processor_PT import Data_Processor_PT
+from GUARDIANCE.contained_DMMs.LLM.impl_interfaces.data_processor_PT import Data_Processor_PT
 import uuid
-from LLM_agent.impl_interfaces.guard_PT import Guard_PT
+from GUARDIANCE.contained_DMMs.LLM.impl_interfaces.guard_PT import Guard_PT
+from GUARDIANCE.contained_DMMs.DMM_components.baml.baml_client import b
 
 """
 An implementation of an RGA (reason-guided agent) with an LLM as DMM (decision-making module).
 """
-class RGA():
+class contained_LLM_PT():
     def __init__(self):
         self.config = Config()
         self.DMM = b
