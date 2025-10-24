@@ -28,6 +28,7 @@ def navigate(env, agent):
             _, _, terminated, truncated, info = env.step(action)
 
 
+# set up environment and agent
 agent = RGA()
 env_id = 'Preschool-v0'
 if env_id not in gym.envs.registry:
@@ -39,7 +40,9 @@ if env_id not in gym.envs.registry:
 env = gym.make("Preschool-v0")
 env = Preschool_Text(env)
 
+# set initial rules for the agent
 set_rules(agent)
 agent.reasoning_unit.log_reason_theory(logger)
 
+# start navigation
 navigate(env, agent)

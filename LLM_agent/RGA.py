@@ -12,11 +12,11 @@ An implementation of an RGA (reason-guided agent) with an LLM as DMM (decision-m
 class RGA():
     def __init__(self):
         self.config = Config()
-        self.LLM_interface = b
+        self.DMM = b
         self.mat_mapping = MAT_mapping_PT(self.config)
         self.data_processor = Data_Processor_PT()
         self.reasoning_unit = ReasoningUnit(self.mat_mapping, self.data_processor)
-        self.guard = Guard_PT(self.LLM_interface, self.mat_mapping)
+        self.guard = Guard_PT(self.DMM, self.mat_mapping)
 
     #transforms the output to the format expected as input from the environment 
     def output_to_action(self, LLM_Output):
@@ -32,7 +32,7 @@ class RGA():
         # pass information about the environment to the reasoning unit to get the moral obligations
         guiding_rules = self.reasoning_unit.moral_obligations(extracted_data)
         DMM_observation = self.data_processor.DMM_observation(extracted_data, guiding_rules)
-        output =self.LLM_interface.Take_Action_Preschool(agent_zone=DMM_observation["agent_zone"], station_zones=DMM_observation["stations_zones"], zone_ids= DMM_observation["zone_ids"], child_conditions=DMM_observation["child_conditions"], happenings=DMM_observation["happenings"])
+        output =self.DMM.Take_Action_Preschool(agent_zone=DMM_observation["agent_zone"], station_zones=DMM_observation["stations_zones"], zone_ids= DMM_observation["zone_ids"], child_conditions=DMM_observation["child_conditions"], happenings=DMM_observation["happenings"])
         guard_observation = self.data_processor.guard_observation(extracted_data, guiding_rules)
         action = self.output_to_action(output)
         action = self.guard.ensure_conformity(action, guiding_rules, guard_observation)
