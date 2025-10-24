@@ -5,6 +5,8 @@ import logging
 from GUARDIANCE.interfaces.data_processor import Data_Processor
 from GUARDIANCE.interfaces.MAT_mapping import MAT_Mapping
 
+logger = logging.getLogger(__name__)
+
 class ReasoningUnit():
     def __init__(self, MAT_mapping: MAT_Mapping, data_processor: Data_Processor):
         super().__init__()
@@ -14,8 +16,6 @@ class ReasoningUnit():
 
         self.threshold_waiting = 0.8
         self.chosen_scenario = None
-
-        self.logger = logging.getLogger(__name__)
 
     @classmethod
     def int_to_subscript(self, number):
@@ -55,8 +55,15 @@ class ReasoningUnit():
     log the agent's current reason theory
     """
     def log_reason_theory(self, logger):
+        log_lines = []
+        log_lines.append("Current Reason Theory:")
         for reason, obligation, priority in self.reason_theory.edges(data=True):
-            logger.info(f"Reason: {reason}, Obligation: {obligation} with priority order: {priority}\n")
+            log_lines.append(f"Reason: {reason}, Obligation: {obligation} with priority order: {priority}")
+
+        # Join all lines into one single string separated by newlines
+        log_message = "\n".join(log_lines)
+
+        logger.info(log_message)
 
     def powerset(self, iterable):
         s = list(iterable)

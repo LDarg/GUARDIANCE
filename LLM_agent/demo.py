@@ -4,6 +4,14 @@ import gymnasium as gym
 from LLM_agent.utils.rules import set_rules
 import logging
 
+logger = logging.getLogger(__name__)
+logging.basicConfig(filename='demo_LLM.log',
+                    encoding='utf-8',
+                    format='%(asctime)s %(levelname)s [%(filename)s:%(lineno)d] %(message)s',
+                    level=logging.DEBUG)
+
+logging.info("Starting LLM agent demo")
+
 def navigate(env, agent):
     env.set_render_mode("human")
     env.metadata['render_fps'] = 3
@@ -19,10 +27,6 @@ def navigate(env, agent):
             action = agent.take_action(info)
             _, _, terminated, truncated, info = env.step(action)
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-console_handler = logging.StreamHandler()
-logger.addHandler(console_handler) 
 
 agent = RGA()
 env_id = 'Preschool-v0'

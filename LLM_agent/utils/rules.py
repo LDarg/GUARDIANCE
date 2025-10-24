@@ -1,4 +1,8 @@
+import logging
+logger = logging.getLogger(__name__)
+
 def set_rules(agent):
+    logger.info("Setting initial rules for normative compliance in the agent's reasoning unit.")
      # add reason-nodes
     agent.reasoning_unit.reason_theory.add_node('A child is crying and needs comfort'.replace(" ", "_"), type='morally relevant fact')
     agent.reasoning_unit.reason_theory.add_node('A child has fallen down and needs help to get up'.replace(" ", "_"), type='morally relevant fact')
