@@ -76,9 +76,9 @@ class BamlAsyncClient:
     def parse_stream(self):
       return self.__llm_stream_parser
     
-    async def Rethink_Choice_Of_Action(self, action: types.Output,obligation: types.Obligation,
+    async def Rethink_Choice_Of_Action(self, action: types.Output_PT,obligation: types.Obligation,
         baml_options: BamlCallOptions = {},
-    ) -> types.Output:
+    ) -> types.Output_PT:
         # Check if on_tick is provided
         if 'on_tick' in baml_options:
             # Use streaming internally when on_tick is provided
@@ -90,10 +90,25 @@ class BamlAsyncClient:
             result = await self.__options.merge_options(baml_options).call_function_async(function_name="Rethink_Choice_Of_Action", args={
                 "action": action,"obligation": obligation,
             })
-            return typing.cast(types.Output, result.cast_to(types, types, stream_types, False, __runtime__))
-    async def Take_Action_Preschool(self, agent_zone: types.Zone,station_zones: typing.List["types.Zone"],zone_ids: typing.List["types.Zone"],child_conditions: typing.Optional[typing.List["types.Child_Condition"]] = None,happenings: typing.Optional[typing.List["types.Happening"]] = None,
+            return typing.cast(types.Output_PT, result.cast_to(types, types, stream_types, False, __runtime__))
+    async def Take_Action_PG(self, agent_coordinate: types.Coordinate,stations_coordinates: typing.List["types.Coordinate"],zones: typing.List["types.Zone_PG"],child_conditions: typing.Optional[typing.List["types.Child_Condition_PG"]] = None,happenings: typing.Optional[typing.List["types.Happening"]] = None,
         baml_options: BamlCallOptions = {},
-    ) -> types.Output:
+    ) -> types.Output_PG:
+        # Check if on_tick is provided
+        if 'on_tick' in baml_options:
+            # Use streaming internally when on_tick is provided
+            stream = self.stream.Take_Action_PG(agent_coordinate=agent_coordinate,stations_coordinates=stations_coordinates,zones=zones,child_conditions=child_conditions,happenings=happenings,
+                baml_options=baml_options)
+            return await stream.get_final_response()
+        else:
+            # Original non-streaming code
+            result = await self.__options.merge_options(baml_options).call_function_async(function_name="Take_Action_PG", args={
+                "agent_coordinate": agent_coordinate,"stations_coordinates": stations_coordinates,"zones": zones,"child_conditions": child_conditions,"happenings": happenings,
+            })
+            return typing.cast(types.Output_PG, result.cast_to(types, types, stream_types, False, __runtime__))
+    async def Take_Action_Preschool(self, agent_zone: types.Zone,station_zones: typing.List["types.Zone"],zone_ids: typing.List["types.Zone"],child_conditions: typing.Optional[typing.List["types.Child_Condition_PT"]] = None,happenings: typing.Optional[typing.List["types.Happening_PT"]] = None,
+        baml_options: BamlCallOptions = {},
+    ) -> types.Output_PT:
         # Check if on_tick is provided
         if 'on_tick' in baml_options:
             # Use streaming internally when on_tick is provided
@@ -105,7 +120,7 @@ class BamlAsyncClient:
             result = await self.__options.merge_options(baml_options).call_function_async(function_name="Take_Action_Preschool", args={
                 "agent_zone": agent_zone,"station_zones": station_zones,"zone_ids": zone_ids,"child_conditions": child_conditions,"happenings": happenings,
             })
-            return typing.cast(types.Output, result.cast_to(types, types, stream_types, False, __runtime__))
+            return typing.cast(types.Output_PT, result.cast_to(types, types, stream_types, False, __runtime__))
     
 
 
@@ -115,28 +130,40 @@ class BamlStreamClient:
     def __init__(self, options: DoNotUseDirectlyCallManager):
         self.__options = options
 
-    def Rethink_Choice_Of_Action(self, action: types.Output,obligation: types.Obligation,
+    def Rethink_Choice_Of_Action(self, action: types.Output_PT,obligation: types.Obligation,
         baml_options: BamlCallOptions = {},
-    ) -> baml_py.BamlStream[stream_types.Output, types.Output]:
+    ) -> baml_py.BamlStream[stream_types.Output_PT, types.Output_PT]:
         ctx, result = self.__options.merge_options(baml_options).create_async_stream(function_name="Rethink_Choice_Of_Action", args={
             "action": action,"obligation": obligation,
         })
-        return baml_py.BamlStream[stream_types.Output, types.Output](
+        return baml_py.BamlStream[stream_types.Output_PT, types.Output_PT](
           result,
-          lambda x: typing.cast(stream_types.Output, x.cast_to(types, types, stream_types, True, __runtime__)),
-          lambda x: typing.cast(types.Output, x.cast_to(types, types, stream_types, False, __runtime__)),
+          lambda x: typing.cast(stream_types.Output_PT, x.cast_to(types, types, stream_types, True, __runtime__)),
+          lambda x: typing.cast(types.Output_PT, x.cast_to(types, types, stream_types, False, __runtime__)),
           ctx,
         )
-    def Take_Action_Preschool(self, agent_zone: types.Zone,station_zones: typing.List["types.Zone"],zone_ids: typing.List["types.Zone"],child_conditions: typing.Optional[typing.List["types.Child_Condition"]] = None,happenings: typing.Optional[typing.List["types.Happening"]] = None,
+    def Take_Action_PG(self, agent_coordinate: types.Coordinate,stations_coordinates: typing.List["types.Coordinate"],zones: typing.List["types.Zone_PG"],child_conditions: typing.Optional[typing.List["types.Child_Condition_PG"]] = None,happenings: typing.Optional[typing.List["types.Happening"]] = None,
         baml_options: BamlCallOptions = {},
-    ) -> baml_py.BamlStream[stream_types.Output, types.Output]:
+    ) -> baml_py.BamlStream[stream_types.Output_PG, types.Output_PG]:
+        ctx, result = self.__options.merge_options(baml_options).create_async_stream(function_name="Take_Action_PG", args={
+            "agent_coordinate": agent_coordinate,"stations_coordinates": stations_coordinates,"zones": zones,"child_conditions": child_conditions,"happenings": happenings,
+        })
+        return baml_py.BamlStream[stream_types.Output_PG, types.Output_PG](
+          result,
+          lambda x: typing.cast(stream_types.Output_PG, x.cast_to(types, types, stream_types, True, __runtime__)),
+          lambda x: typing.cast(types.Output_PG, x.cast_to(types, types, stream_types, False, __runtime__)),
+          ctx,
+        )
+    def Take_Action_Preschool(self, agent_zone: types.Zone,station_zones: typing.List["types.Zone"],zone_ids: typing.List["types.Zone"],child_conditions: typing.Optional[typing.List["types.Child_Condition_PT"]] = None,happenings: typing.Optional[typing.List["types.Happening_PT"]] = None,
+        baml_options: BamlCallOptions = {},
+    ) -> baml_py.BamlStream[stream_types.Output_PT, types.Output_PT]:
         ctx, result = self.__options.merge_options(baml_options).create_async_stream(function_name="Take_Action_Preschool", args={
             "agent_zone": agent_zone,"station_zones": station_zones,"zone_ids": zone_ids,"child_conditions": child_conditions,"happenings": happenings,
         })
-        return baml_py.BamlStream[stream_types.Output, types.Output](
+        return baml_py.BamlStream[stream_types.Output_PT, types.Output_PT](
           result,
-          lambda x: typing.cast(stream_types.Output, x.cast_to(types, types, stream_types, True, __runtime__)),
-          lambda x: typing.cast(types.Output, x.cast_to(types, types, stream_types, False, __runtime__)),
+          lambda x: typing.cast(stream_types.Output_PT, x.cast_to(types, types, stream_types, True, __runtime__)),
+          lambda x: typing.cast(types.Output_PT, x.cast_to(types, types, stream_types, False, __runtime__)),
           ctx,
         )
     
@@ -147,14 +174,21 @@ class BamlHttpRequestClient:
     def __init__(self, options: DoNotUseDirectlyCallManager):
         self.__options = options
 
-    async def Rethink_Choice_Of_Action(self, action: types.Output,obligation: types.Obligation,
+    async def Rethink_Choice_Of_Action(self, action: types.Output_PT,obligation: types.Obligation,
         baml_options: BamlCallOptions = {},
     ) -> baml_py.baml_py.HTTPRequest:
         result = await self.__options.merge_options(baml_options).create_http_request_async(function_name="Rethink_Choice_Of_Action", args={
             "action": action,"obligation": obligation,
         }, mode="request")
         return result
-    async def Take_Action_Preschool(self, agent_zone: types.Zone,station_zones: typing.List["types.Zone"],zone_ids: typing.List["types.Zone"],child_conditions: typing.Optional[typing.List["types.Child_Condition"]] = None,happenings: typing.Optional[typing.List["types.Happening"]] = None,
+    async def Take_Action_PG(self, agent_coordinate: types.Coordinate,stations_coordinates: typing.List["types.Coordinate"],zones: typing.List["types.Zone_PG"],child_conditions: typing.Optional[typing.List["types.Child_Condition_PG"]] = None,happenings: typing.Optional[typing.List["types.Happening"]] = None,
+        baml_options: BamlCallOptions = {},
+    ) -> baml_py.baml_py.HTTPRequest:
+        result = await self.__options.merge_options(baml_options).create_http_request_async(function_name="Take_Action_PG", args={
+            "agent_coordinate": agent_coordinate,"stations_coordinates": stations_coordinates,"zones": zones,"child_conditions": child_conditions,"happenings": happenings,
+        }, mode="request")
+        return result
+    async def Take_Action_Preschool(self, agent_zone: types.Zone,station_zones: typing.List["types.Zone"],zone_ids: typing.List["types.Zone"],child_conditions: typing.Optional[typing.List["types.Child_Condition_PT"]] = None,happenings: typing.Optional[typing.List["types.Happening_PT"]] = None,
         baml_options: BamlCallOptions = {},
     ) -> baml_py.baml_py.HTTPRequest:
         result = await self.__options.merge_options(baml_options).create_http_request_async(function_name="Take_Action_Preschool", args={
@@ -169,14 +203,21 @@ class BamlHttpStreamRequestClient:
     def __init__(self, options: DoNotUseDirectlyCallManager):
         self.__options = options
 
-    async def Rethink_Choice_Of_Action(self, action: types.Output,obligation: types.Obligation,
+    async def Rethink_Choice_Of_Action(self, action: types.Output_PT,obligation: types.Obligation,
         baml_options: BamlCallOptions = {},
     ) -> baml_py.baml_py.HTTPRequest:
         result = await self.__options.merge_options(baml_options).create_http_request_async(function_name="Rethink_Choice_Of_Action", args={
             "action": action,"obligation": obligation,
         }, mode="stream")
         return result
-    async def Take_Action_Preschool(self, agent_zone: types.Zone,station_zones: typing.List["types.Zone"],zone_ids: typing.List["types.Zone"],child_conditions: typing.Optional[typing.List["types.Child_Condition"]] = None,happenings: typing.Optional[typing.List["types.Happening"]] = None,
+    async def Take_Action_PG(self, agent_coordinate: types.Coordinate,stations_coordinates: typing.List["types.Coordinate"],zones: typing.List["types.Zone_PG"],child_conditions: typing.Optional[typing.List["types.Child_Condition_PG"]] = None,happenings: typing.Optional[typing.List["types.Happening"]] = None,
+        baml_options: BamlCallOptions = {},
+    ) -> baml_py.baml_py.HTTPRequest:
+        result = await self.__options.merge_options(baml_options).create_http_request_async(function_name="Take_Action_PG", args={
+            "agent_coordinate": agent_coordinate,"stations_coordinates": stations_coordinates,"zones": zones,"child_conditions": child_conditions,"happenings": happenings,
+        }, mode="stream")
+        return result
+    async def Take_Action_Preschool(self, agent_zone: types.Zone,station_zones: typing.List["types.Zone"],zone_ids: typing.List["types.Zone"],child_conditions: typing.Optional[typing.List["types.Child_Condition_PT"]] = None,happenings: typing.Optional[typing.List["types.Happening_PT"]] = None,
         baml_options: BamlCallOptions = {},
     ) -> baml_py.baml_py.HTTPRequest:
         result = await self.__options.merge_options(baml_options).create_http_request_async(function_name="Take_Action_Preschool", args={

@@ -16,20 +16,35 @@ from . import stream_types
 
 type_map = {
 
-    "types.Child_Condition": types.Child_Condition,
-    "stream_types.Child_Condition": stream_types.Child_Condition,
+    "types.Child_Condition_PG": types.Child_Condition_PG,
+    "stream_types.Child_Condition_PG": stream_types.Child_Condition_PG,
+
+    "types.Child_Condition_PT": types.Child_Condition_PT,
+    "stream_types.Child_Condition_PT": stream_types.Child_Condition_PT,
+
+    "types.Coordinate": types.Coordinate,
+    "stream_types.Coordinate": stream_types.Coordinate,
 
     "types.Happening": types.Happening,
     "stream_types.Happening": stream_types.Happening,
 
+    "types.Happening_PT": types.Happening_PT,
+    "stream_types.Happening_PT": stream_types.Happening_PT,
+
     "types.Obligation": types.Obligation,
     "stream_types.Obligation": stream_types.Obligation,
 
-    "types.Output": types.Output,
-    "stream_types.Output": stream_types.Output,
+    "types.Output_PG": types.Output_PG,
+    "stream_types.Output_PG": stream_types.Output_PG,
+
+    "types.Output_PT": types.Output_PT,
+    "stream_types.Output_PT": stream_types.Output_PT,
 
     "types.Zone": types.Zone,
     "stream_types.Zone": stream_types.Zone,
+
+    "types.Zone_PG": types.Zone_PG,
+    "stream_types.Zone_PG": stream_types.Zone_PG,
 
 
 }

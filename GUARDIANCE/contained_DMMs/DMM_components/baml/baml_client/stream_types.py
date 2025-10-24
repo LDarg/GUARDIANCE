@@ -23,32 +23,57 @@ class StreamState(BaseModel, typing.Generic[StreamStateValueT]):
     value: StreamStateValueT
     state: typing_extensions.Literal["Pending", "Incomplete", "Complete"]
 # #########################################################################
-# Generated classes (5)
+# Generated classes (10)
 # #########################################################################
 
-class Child_Condition(BaseModel):
+class Child_Condition_PG(BaseModel):
+    child_id: typing.Optional[str] = None
+    reason: typing.Optional[str] = None
+    required_MAT: typing.Optional[str] = None
+    coordinate: typing.Optional[str] = None
+
+class Child_Condition_PT(BaseModel):
     child_id: typing.Optional[str] = None
     reason: typing.Optional[str] = None
     required_MAT: typing.Optional[str] = None
     zone_name: typing.Optional[str] = None
     zone_id: typing.Optional[str] = None
 
+class Coordinate(BaseModel):
+    x: typing.Optional[int] = None
+    y: typing.Optional[int] = None
+
 class Happening(BaseModel):
+    zone: typing.Optional["Zone_PG"] = None
+    reason: typing.Optional[str] = None
+    required_MAT: typing.Optional[str] = None
+
+class Happening_PT(BaseModel):
     zone_id: typing.Optional[str] = None
     reason: typing.Optional[str] = None
     required_MAT: typing.Optional[str] = None
     zone_name: typing.Optional[str] = None
 
 class Obligation(BaseModel):
-    obligation: typing.Optional[typing.Union["Happening", "Child_Condition"]] = None
+    obligation: typing.Optional[typing.Union["Happening", "Child_Condition_PT"]] = None
 
-class Output(BaseModel):
+class Output_PG(BaseModel):
+    type: typing.Optional[typing.Union[str, str, str]] = None
+    identifier: typing.Optional[str] = None
+    help: typing.Optional[str] = None
+    target_position_coordinates: typing.Optional[typing.List[int]] = None
+
+class Output_PT(BaseModel):
     type: typing.Optional[typing.Union[str, str, str]] = None
     identifier: typing.Optional[str] = None
     help: typing.Optional[str] = None
 
 class Zone(BaseModel):
     zone_id: typing.Optional[str] = None
+
+class Zone_PG(BaseModel):
+    zone_id: typing.Optional[str] = None
+    coordinates: typing.List["Coordinate"]
 
 # #########################################################################
 # Generated type aliases (0)

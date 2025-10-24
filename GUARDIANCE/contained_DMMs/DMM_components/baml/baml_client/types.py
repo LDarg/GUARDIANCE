@@ -41,32 +41,57 @@ def all_succeeded(checks: typing.Dict[CheckName, Check]) -> bool:
 # #########################################################################
 
 # #########################################################################
-# Generated classes (5)
+# Generated classes (10)
 # #########################################################################
 
-class Child_Condition(BaseModel):
+class Child_Condition_PG(BaseModel):
+    child_id: str
+    reason: str
+    required_MAT: str
+    coordinate: str
+
+class Child_Condition_PT(BaseModel):
     child_id: str
     reason: str
     required_MAT: str
     zone_name: str
     zone_id: str
 
+class Coordinate(BaseModel):
+    x: int
+    y: int
+
 class Happening(BaseModel):
+    zone: "Zone_PG"
+    reason: str
+    required_MAT: str
+
+class Happening_PT(BaseModel):
     zone_id: str
     reason: str
     required_MAT: str
     zone_name: str
 
 class Obligation(BaseModel):
-    obligation: typing.Union["Happening", "Child_Condition"]
+    obligation: typing.Union["Happening", "Child_Condition_PT"]
 
-class Output(BaseModel):
+class Output_PG(BaseModel):
+    type: typing.Union[typing_extensions.Literal['move'], typing_extensions.Literal['prepare'], typing_extensions.Literal['help']]
+    identifier: typing.Optional[str] = None
+    help: typing.Optional[str] = None
+    target_position_coordinates: typing.Optional[typing.List[int]] = None
+
+class Output_PT(BaseModel):
     type: typing.Union[typing_extensions.Literal['move'], typing_extensions.Literal['prepare'], typing_extensions.Literal['help']]
     identifier: typing.Optional[str] = None
     help: typing.Optional[str] = None
 
 class Zone(BaseModel):
     zone_id: str
+
+class Zone_PG(BaseModel):
+    zone_id: str
+    coordinates: typing.List["Coordinate"]
 
 # #########################################################################
 # Generated type aliases (0)

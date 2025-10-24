@@ -36,7 +36,7 @@ class Happening_PT {
 }
 
 class Obligation {
-  obligation Happening | Child_Condition
+  obligation Happening | Child_Condition_PT
 }
 
 class Output_PT {
@@ -51,7 +51,7 @@ class Output_PT {
   "#)
 }
 
-function Take_Action_Preschool(agent_zone: Zone, station_zones: Zone[], zone_ids: Zone[],child_conditions: Child_Condition_PT[]?, happenings: Happening_PT[]?) -> Output {
+function Take_Action_Preschool(agent_zone: Zone, station_zones: Zone[], zone_ids: Zone[],child_conditions: Child_Condition_PT[]?, happenings: Happening_PT[]?) -> Output_PT {
     client CustomGPT4o
     prompt #"
       {{ _.role("system") }}
@@ -82,7 +82,7 @@ function Take_Action_Preschool(agent_zone: Zone, station_zones: Zone[], zone_ids
     "#
 }
 
-function Rethink_Choice_Of_Action(action: Output, obligation:Obligation) -> Output {
+function Rethink_Choice_Of_Action(action: Output_PT, obligation:Obligation) -> Output_PT {
   client CustomGPT4o
   prompt #"
   {{ _.role("user") }}

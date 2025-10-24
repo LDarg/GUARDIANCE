@@ -22,17 +22,14 @@ class Child_Condition_PG {
 }
 
 class Happening {
-  zone_coordinates string @description(#"
-    the coordinates of the zone
+  zone Zone_PG @description(#"
+    the zone at which the event is happening
   "#)
   reason string @description(#"
     description of what is happening in the zone
   "#)
   required_MAT string @description(#"
     what is required to be conform with what is demanded due to the happening
-  "#)
-  zone_name string @description(#"
-    the name of the zone
   "#)
 }
 
@@ -88,56 +85,132 @@ function Take_Action_PG(agent_coordinate: Coordinate, stations_coordinates: Coor
 }
 
 
---------------------
-
-class NavigationAgent {
-  tool_name "navigation_agent"
-  goal_position_coordinates int[] @description("the goal coordinates")
-}
-
-class SpotNextToPerson {
-  tool_name "get_spot_next_to_person"
-  goal_position_coordinates int[] @description("the goal coordinates")
-}
-
-
-class PullOutOfWater {
-  tool_name "special_action"
-  description_of_the_action string @description("description of the action you want to take")
-
-}
-
-class Obligation {
-  obligation string
-}
-
-function MacroActionExecution(agent_position: Position,target_position: Position, obligations: string) -> NavigationAgent | PullOutOfWater {
-    client CustomGPT3Turbo
-    prompt #"
-      {{ _.role("system") }}
-      You are a package delivery robot navigating a grid-world.
-      You want to navigate to the coordinates [{{ target_position.column }} {{ target_position.row }}].
-
-      You have to fulfill the following obligations. Each obligation is more important than delivering the package:
-      {{ obligations }}
-      If you want to rescue a drowning person, you need to position yourself at the position at which they need to be rescued, first.
-      Otherwise, navigate to the package delivery destination.
-
-      {{ _.role("user") }}
-      Make a plan consisting of a sequence of steps where each step is one of the following: 
-      1. navigate to the coordinate of the package delivery destination or
-      2. navigate to a location where you need to navigate to in order to fulfill an obligation or
-      3. fulfill the obligation.
-      After making a complete plan, decide which tool you want to use first.
-
-    {{ ctx.output_format }}
-    "#
-}
-
-test macro_action_execution_test {
-  functions [MacroActionExecution]
+test take_action_pg_basic {
+  functions [Take_Action_PG]
   args {
-    target_position {"row": 0, "column": 0}
-    obligations "Rescue the drowning person at position [2,3]."
+    agent_coordinate {"x": 1, "y": 1}
+    stations_coordinates [
+      {"x": 3, "y": 2},
+      {"x": 5, "y": 4},
+      {"x": 2, "y": 6}
+    ]
+    zones [
+      {
+        "zone_id": "reading_corner",
+        "coordinates": [{"x": 2, "y": 2}, {"x": 3, "y": 2}, {"x": 4, "y": 2}]
+      },
+      {
+        "zone_id": "craft_area", 
+        "coordinates": [{"x": 4, "y": 4}, {"x": 5, "y": 4}, {"x": 6, "y": 4}]
+      },
+      {
+        "zone_id": "play_zone",
+        "coordinates": [{"x": 1, "y": 6}, {"x": 2, "y": 6}, {"x": 3, "y": 6}]
+      }
+    ]
+    child_conditions null
+    happenings null
+  }
+}
+
+test take_action_pg_child_help {
+  functions [Take_Action_PG]
+  args {
+    agent_coordinate {"x": 1, "y": 1}
+    stations_coordinates [
+      {"x": 3, "y": 2},
+      {"x": 5, "y": 4}
+    ]
+    zones [
+      {
+        "zone_id": "reading_corner",
+        "coordinates": [{"x": 2, "y": 2}, {"x": 3, "y": 2}, {"x": 4, "y": 2}]
+      }
+    ]
+    child_conditions [
+      {
+        "child_id": "Emma_5",
+        "reason": "Child is crying and needs comfort",
+        "required_MAT": "provide_emotional_support",
+        "coordinate": "2,3"
+      }
+    ]
+    happenings null
+  }
+}
+
+test take_action_pg_zone_happening {
+  functions [Take_Action_PG]
+  args {
+    agent_coordinate {"x": 4, "y": 4}
+    stations_coordinates [
+      {"x": 3, "y": 2},
+      {"x": 5, "y": 4}
+    ]
+    zones [
+      {
+        "zone_id": "craft_area", 
+        "coordinates": [{"x": 4, "y": 4}, {"x": 5, "y": 4}, {"x": 6, "y": 4}]
+      },
+      {
+        "zone_id": "reading_corner",
+        "coordinates": [{"x": 2, "y": 2}, {"x": 3, "y": 2}, {"x": 4, "y": 2}]
+      }
+    ]
+    child_conditions null
+    happenings [
+      {
+        "zone": {
+          "zone_id": "craft_area",
+          "coordinates": [{"x": 4, "y": 4}, {"x": 5, "y": 4}, {"x": 6, "y": 4}]
+        },
+        "reason": "Spilled water on floor - slip hazard",
+        "required_MAT": "avoid_zone_until_cleaned"
+      }
+    ]
+  }
+}
+
+test take_action_pg_complex {
+  functions [Take_Action_PG]
+  args {
+    agent_coordinate {"x": 1, "y": 1}
+    stations_coordinates [
+      {"x": 3, "y": 2},
+      {"x": 5, "y": 4},
+      {"x": 2, "y": 6}
+    ]
+    zones [
+      {
+        "zone_id": "reading_corner",
+        "coordinates": [{"x": 2, "y": 2}, {"x": 3, "y": 2}, {"x": 4, "y": 2}]
+      },
+      {
+        "zone_id": "craft_area", 
+        "coordinates": [{"x": 4, "y": 4}, {"x": 5, "y": 4}, {"x": 6, "y": 4}]
+      },
+      {
+        "zone_id": "quiet_zone",
+        "coordinates": [{"x": 1, "y": 6}, {"x": 2, "y": 6}, {"x": 3, "y": 6}]
+      }
+    ]
+    child_conditions [
+      {
+        "child_id": "Liam_4",
+        "reason": "Child fell down and is hurt",
+        "required_MAT": "provide_first_aid",
+        "coordinate": "6,5"
+      }
+    ]
+    happenings [
+      {
+        "zone": {
+          "zone_id": "quiet_zone",
+          "coordinates": [{"x": 1, "y": 6}, {"x": 2, "y": 6}, {"x": 3, "y": 6}]
+        },
+        "reason": "Naptime in progress - noise restrictions",
+        "required_MAT": "maintain_quiet_environment"
+      }
+    ]
   }
 }

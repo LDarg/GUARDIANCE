@@ -24,15 +24,21 @@ class LlmResponseParser:
 
     def Rethink_Choice_Of_Action(
         self, llm_response: str, baml_options: BamlCallOptions = {},
-    ) -> types.Output:
+    ) -> types.Output_PT:
         result = self.__options.merge_options(baml_options).parse_response(function_name="Rethink_Choice_Of_Action", llm_response=llm_response, mode="request")
-        return typing.cast(types.Output, result)
+        return typing.cast(types.Output_PT, result)
+
+    def Take_Action_PG(
+        self, llm_response: str, baml_options: BamlCallOptions = {},
+    ) -> types.Output_PG:
+        result = self.__options.merge_options(baml_options).parse_response(function_name="Take_Action_PG", llm_response=llm_response, mode="request")
+        return typing.cast(types.Output_PG, result)
 
     def Take_Action_Preschool(
         self, llm_response: str, baml_options: BamlCallOptions = {},
-    ) -> types.Output:
+    ) -> types.Output_PT:
         result = self.__options.merge_options(baml_options).parse_response(function_name="Take_Action_Preschool", llm_response=llm_response, mode="request")
-        return typing.cast(types.Output, result)
+        return typing.cast(types.Output_PT, result)
 
     
 
@@ -44,14 +50,20 @@ class LlmStreamParser:
 
     def Rethink_Choice_Of_Action(
         self, llm_response: str, baml_options: BamlCallOptions = {},
-    ) -> stream_types.Output:
+    ) -> stream_types.Output_PT:
         result = self.__options.merge_options(baml_options).parse_response(function_name="Rethink_Choice_Of_Action", llm_response=llm_response, mode="stream")
-        return typing.cast(stream_types.Output, result)
+        return typing.cast(stream_types.Output_PT, result)
+
+    def Take_Action_PG(
+        self, llm_response: str, baml_options: BamlCallOptions = {},
+    ) -> stream_types.Output_PG:
+        result = self.__options.merge_options(baml_options).parse_response(function_name="Take_Action_PG", llm_response=llm_response, mode="stream")
+        return typing.cast(stream_types.Output_PG, result)
 
     def Take_Action_Preschool(
         self, llm_response: str, baml_options: BamlCallOptions = {},
-    ) -> stream_types.Output:
+    ) -> stream_types.Output_PT:
         result = self.__options.merge_options(baml_options).parse_response(function_name="Take_Action_Preschool", llm_response=llm_response, mode="stream")
-        return typing.cast(stream_types.Output, result)
+        return typing.cast(stream_types.Output_PT, result)
 
     
