@@ -2,7 +2,7 @@ class Zone {
   zone_id string
 }
 
-class Child_Condition {
+class Child_Condition_PT {
   child_id string @description(#"
     the identifier of the child
   "#)
@@ -10,7 +10,7 @@ class Child_Condition {
     description why the child needs help
   "#)
   required_MAT string @description(#"
-    the action through which you help the child, must be one of the resolutions passed
+    the action through which you help the child
   "#)
   zone_name string @description(#"
     the zone where the child is located
@@ -20,7 +20,7 @@ class Child_Condition {
   "#)
 }
 
-class Happening {
+class Happening_PT {
   zone_id string @description(#"
     the id of the zone
   "#)
@@ -28,7 +28,7 @@ class Happening {
     description of what is happening in the zone
   "#)
   required_MAT string @description(#"
-    the action through which you help the child, must be one of the resolutions passed
+    what is required to be conform with what is demanded due to the happening
   "#)
   zone_name string @description(#"
     the name of the zone
@@ -39,7 +39,7 @@ class Obligation {
   obligation Happening | Child_Condition
 }
 
-class Output {
+class Output_PT {
   type "move" | "prepare" |"help" @description(#"
     the type of action you want to take (move or prepare)
   "#)
@@ -47,11 +47,11 @@ class Output {
     the identifier of the child you want to help or the zone you want to move to
   "#)
   help string? @description(#"
-    the action through which you help a child, must be one of the resolutions passed (only needed if type is help)
+    the action through which you help a child
   "#)
 }
 
-function Take_Action_Preschool(agent_zone: Zone, station_zones: Zone[], zone_ids: Zone[],child_conditions: Child_Condition[]?, happenings: Happening[]?) -> Output {
+function Take_Action_Preschool(agent_zone: Zone, station_zones: Zone[], zone_ids: Zone[],child_conditions: Child_Condition_PT[]?, happenings: Happening_PT[]?) -> Output {
     client CustomGPT4o
     prompt #"
       {{ _.role("system") }}

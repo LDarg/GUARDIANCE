@@ -203,6 +203,8 @@ class Preschool_Grid(gym.Env):
         nn_input = np.concatenate([agent_flat])
 
         return np.array(nn_input.astype(np.float32))
+
+    
     
     def get_obs_dict(self):
         # agent's position (one-hot encoding)
@@ -232,6 +234,28 @@ class Preschool_Grid(gym.Env):
             "zones": zones_facts,
             "agent": self.map.get_zone(self.agent_coordinates).name
         }
+    
+    def get_facts(self):
+            children_facts = set()
+            zones_facts = set()
+            agent_zone = self.map.get_zone(self.agent_coordinates).id
+
+            for child in self.map.children:
+                children_facts.add((child.id, f"{child.condition}", self.map.get_zone(child.coordinates).name, self.map.get_zone(child.coordinates).id))
+
+            for zone in self.map.zones:
+                if zone.happening is not None:
+                    zones_facts.add((zone.id, zone.happening, zone.name))
+
+            stations_zones = [{"zone_id": str(self.map.get_zone(learning_station.coordinates).id)} for learning_station in self.map.learning_stations]
+            
+            return {
+                "children": children_facts,
+                "zones": zones_facts,
+                "agent_zone": agent_zone,
+                "stations_zones": stations_zones,
+                "zone_ids": [zone.id for zone in self.map.zones]
+            }
     
     """
     functions for handling positions
