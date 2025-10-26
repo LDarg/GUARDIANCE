@@ -49,7 +49,6 @@ class Data_Processor_PG(Data_Processor):
         groundings = set()
         truthmakers = [item for item in extracted_data["children"].items() if item[1].get("description") == rule[0]] + \
                       [item for item in extracted_data["happenings"].items() if item[1].get("description") == rule[0]] 
-                      #[item for item in extracted_data["zones"].items() if item[1].get("description") ==  rule[0]]
         for truthmaker in truthmakers:
             resolution = rule[1]
             groundings.add(((truthmaker[1]["description"], resolution), truthmaker[0]))
