@@ -194,18 +194,8 @@ class Preschool_Grid(gym.Env):
     return of the observation function: the flattened and concatenated agent and goal position observations (np.array)
     """
     def observation(self):
-        obs_dict = self.get_obs_dict()
+        return np.array([self.agent_coordinates[0], self.agent_coordinates[1]])
 
-        # flatten 
-        agent_flat = obs_dict["agent_window"].flatten()
-
-        # concatenate into one 1D array
-        nn_input = np.concatenate([agent_flat])
-
-        return np.array(nn_input.astype(np.float32))
-
-    
-    
     def get_obs_dict(self):
         # agent's position (one-hot encoding)
         agent_window = np.zeros((self.map.height, self.map.width))
@@ -218,44 +208,28 @@ class Preschool_Grid(gym.Env):
         return observation
 
     def get_facts(self):
-        children_facts = set()
-        zones_facts = set()
-        agent_facts = set()
+        children_facts = []
+        zones_facts = []
 
         for child in self.map.children:
-            children_facts.add((f"{child.condition}", tuple(child.coordinates)))
+            children_facts.append((child.id, f"{child.condition}", child.coordinates))
 
         for zone in self.map.zones:
-            if zone.happening is not None:
-                zones_facts.add((zone.happening, zone.name))
+                if zone.happening is not None:
+                    zones_facts.append((zone.id, zone.happening, zone.coordinates))
         
         return {
             "children": children_facts,
-            "zones": zones_facts,
-            "agent": self.map.get_zone(self.agent_coordinates).name
+            "happenings": zones_facts,
+            "agent_coordinate": self.agent_coordinates,
+            "station_coordinates": [station.coordinates for station in self.map.learning_stations],
         }
     
-    def get_facts(self):
-            children_facts = set()
-            zones_facts = set()
-            agent_zone = self.map.get_zone(self.agent_coordinates).id
-
-            for child in self.map.children:
-                children_facts.add((child.id, f"{child.condition}", self.map.get_zone(child.coordinates).name, self.map.get_zone(child.coordinates).id))
-
-            for zone in self.map.zones:
-                if zone.happening is not None:
-                    zones_facts.add((zone.id, zone.happening, zone.name))
-
-            stations_zones = [{"zone_id": str(self.map.get_zone(learning_station.coordinates).id)} for learning_station in self.map.learning_stations]
-            
-            return {
-                "children": children_facts,
-                "zones": zones_facts,
-                "agent_zone": agent_zone,
-                "stations_zones": stations_zones,
-                "zone_ids": [zone.id for zone in self.map.zones]
-            }
+    def static_facts(self):
+        return {
+            "zones": [(zone.id, zone.coordinates) for zone in self.map.zones],
+            "size": (self.map.width, self.map.height)
+        }
     
     """
     functions for handling positions
@@ -286,7 +260,7 @@ class Preschool_Grid(gym.Env):
         super().reset(seed=seed)
         self.initialize_at_reset(self.np_random)
         observation = self.observation()
-        info = {"facts": self.get_facts()}
+        info = self.get_facts()
         self.render()
 
         return observation, info
@@ -305,9 +279,9 @@ class Preschool_Grid(gym.Env):
         reward = 0
         terminated = False
 
+        if action[0] == "move":
         # execute the action if it is taking a step in a direction
-        if action in range(4):
-            direction = self.action_to_direction[action]
+            direction = self.action_to_direction[action[1]]
             # ensures that the agent's position stays in the grid
             self.agent_coordinates[0] = np.clip(
                 self.agent_coordinates[0] + direction[0], 0, self.map.width - 1
@@ -316,15 +290,8 @@ class Preschool_Grid(gym.Env):
                 self.agent_coordinates[1] + direction[1], 0, self.map.height - 1
             )
 
-        # exceute the action if it is helping a person or preparing a learning station
-        if action == 4:
-            to_remove = []
-            for child in list(self.map.children):  # iterate over a copy
-                if np.equal(self.agent_coordinates, child.coordinates).all():
-                    to_remove.append(child)
-            for child in to_remove:
-                self.map.delete_moral_goal(child)
-
+        # exceute the action if it is preparing a learning station
+        if action[0] == "prepare":
             for learning_station in self.map.learning_stations:
                 if np.equal(self.agent_coordinates, learning_station.coordinates).all():
                     learning_station.progress()
@@ -332,14 +299,37 @@ class Preschool_Grid(gym.Env):
                         self.map.learning_stations.remove(learning_station)
                     break
 
+        if action[0] == "help":
+            for child in self.map.children:
+                if child.id == action[1] and np.equal(self.agent_coordinates, child.coordinates).all():
+                    if self.map.config.resolutions[child.condition].replace(" ", "_") == action[2]:
+                        self.map.children.remove(child)
+                        break
+
+        # exceute the action if it is helping a person or preparing a learning station
+        #if action == 4:
+        #    to_remove = []
+        #    for child in list(self.map.children):  # iterate over a copy
+        #        if np.equal(self.agent_coordinates, child.coordinates).all():
+        #            to_remove.append(child)
+        #    for child in to_remove:
+        #        self.map.delete_moral_goal(child)
+#
+        #    for learning_station in self.map.learning_stations:
+        #        if np.equal(self.agent_coordinates, learning_station.coordinates).all():
+        #            learning_station.progress()
+        #            if learning_station.finished():
+        #                self.map.learning_stations.remove(learning_station)
+        #            break
+
         # generate moral goals and happenings with a certain probability
-        if random.random() < 0.15:
+        if random.random() < 0.15: #0.15
             self.map.generate_moral_goal()
-        if random.random() < 0.1:
+        if random.random() < 0: #0.1
             self.map.generate_happening()
 
         observation = self.observation()
-        info = {"facts": self.get_facts()}
+        info = self.get_facts()
 
         self.render()
     
@@ -476,7 +466,7 @@ class Preschool_Grid(gym.Env):
         y_offset = self.navigation_area_height + 10
 
         for fact in facts["children"]:
-            text_surface = font.render(fact[0]+": " +str(fact[1]), True, (255, 255, 255))
+            text_surface = font.render(fact[1]+": " +str(fact[2]), True, (255, 255, 255))
             self.window.blit(text_surface, (10, y_offset))   # <-- still using self.window here
             y_offset += text_surface.get_height() + 5
 

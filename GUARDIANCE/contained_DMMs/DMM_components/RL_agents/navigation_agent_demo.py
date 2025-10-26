@@ -21,7 +21,7 @@ def visualize(agent, env, seed=None):
                 with torch.no_grad():
                     # actions: 0=left,1=down,2=right,3=up
                     action = agent.policy_dqn(agent.transformation(state)).argmax().item()
-                state,reward,terminated,truncated,_ = env.step(action)  
+                state,reward,terminated,truncated,_ = env.step(("move", action))  
                 if reward != 0:
                      pass        
 

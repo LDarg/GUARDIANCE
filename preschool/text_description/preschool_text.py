@@ -87,6 +87,7 @@ class Preschool_Text(gym.Wrapper):
             # execute the action if it is helping a child
             if action[0] == "help":
                 for child in self.map.children:
+                    #TODO: check if agent in the same zone as the child
                     if child.id == action[1]:
                         if self.map.config.resolutions[child.condition].replace(" ", "_") == action[2]:
                             self.map.children.remove(child)

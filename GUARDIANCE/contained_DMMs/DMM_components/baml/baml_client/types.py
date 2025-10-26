@@ -48,7 +48,7 @@ class Child_Condition_PG(BaseModel):
     child_id: str
     reason: str
     required_MAT: str
-    coordinate: str
+    coordinate: "Coordinate"
 
 class Child_Condition_PT(BaseModel):
     child_id: str
@@ -62,7 +62,7 @@ class Coordinate(BaseModel):
     y: int
 
 class Happening(BaseModel):
-    zone: "Zone_PG"
+    zone_id: str
     reason: str
     required_MAT: str
 
@@ -79,7 +79,7 @@ class Output_PG(BaseModel):
     type: typing.Union[typing_extensions.Literal['move'], typing_extensions.Literal['prepare'], typing_extensions.Literal['help']]
     identifier: typing.Optional[str] = None
     help: typing.Optional[str] = None
-    target_position_coordinates: typing.Optional[typing.List[int]] = None
+    target_coordinate: typing.Optional[typing.List[int]] = None
 
 class Output_PT(BaseModel):
     type: typing.Union[typing_extensions.Literal['move'], typing_extensions.Literal['prepare'], typing_extensions.Literal['help']]

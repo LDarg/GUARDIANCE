@@ -1,8 +1,8 @@
 import torch
 import random
 from tqdm import tqdm
-from utils import drl
-from utils.plotting import plot_training_progress
+from GUARDIANCE.contained_DMMs.DMM_components.RL_agents.utils import drl
+from GUARDIANCE.contained_DMMs.DMM_components.RL_agents.utils.plotting import plot_training_progress
 import numpy as np
 import logging
 from torch import nn
@@ -110,7 +110,7 @@ class RL_agent:
                         action = self.policy_dqn(self.transformation(state)).argmax().item()
 
                 # execute the agent's action choice
-                new_state,reward,terminated,truncated, info = env.step(action)
+                new_state,reward,terminated,truncated, info = env.step(("move", action))
 
 
                 #self.HER_transformation(new_state,reward,terminated,truncated, info)
@@ -197,30 +197,7 @@ class RL_agent:
                     if env.bridge_map.get_grid_type(neighbor) != env.bridge_map.grid_types["water"]:
                         land_tiles_next_to_person.append(neighbor)
         return land_tiles_next_to_person
-    
-def visualize(agent, env, seed=None):
-
-        env.set_render_mode('human')
-        agent.policy_dqn.eval()  
-        
-        #state, _ = env.reset()
-
-        while True:
-            state, _ = env.reset()
-            terminated = False     
-            truncated = False       
-            #obeservation = env.observation()   
-
-            while(not terminated and not truncated):
-                obs = env.get_obs_dict() 
-                # select morally permissible action  
-                with torch.no_grad():
-                    # actions: 0=left,1=down,2=right,3=up
-                    action_preferences = [tensor.item() for tensor in agent.policy_dqn(agent.transformation(state))]
-                    action = action_preferences.index(max(action_preferences))  
-                state,reward,terminated,truncated,_ = env.step(action)  
-                if reward != 0:
-                     pass     
+     
 
 if __name__ == "__main__":
 
@@ -252,8 +229,5 @@ if __name__ == "__main__":
 
     training_episodes = 800
     train_navigation_policy = agent.train_navigation_policy(env=env, episodes=training_episodes, name=f"navigation_agent_{training_episodes}_episodes", pb=True)
-    for param in agent.policy_dqn.parameters():
-        print(param)
-    visualize(agent, env)
 
 

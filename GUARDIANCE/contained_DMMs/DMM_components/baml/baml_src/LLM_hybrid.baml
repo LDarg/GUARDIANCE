@@ -16,13 +16,13 @@ class Child_Condition_PG {
   required_MAT string @description(#"
     the action through which you help the child
   "#)
-  coordinate string @description(#"
+  coordinate Coordinate @description(#"
     the coordinate of the child's position
   "#)
 }
 
 class Happening {
-  zone Zone_PG @description(#"
+  zone_id string @description(#"
     the zone at which the event is happening
   "#)
   reason string @description(#"
@@ -43,8 +43,8 @@ class Output_PG {
   help string? @description(#"
     the action through which you help a child (needed iff type is help)
   "#)
-  target_position_coordinates int[]? @description(#"
-    the coordinates, you want to move to by calling the navigation agent (needed iff type is move)
+  target_coordinate int[]? @description(#"
+    the coordinate, you want to move to by calling the navigation agent (needed iff type is move)
   "#)
 }
 
@@ -53,13 +53,13 @@ class Coordinate {
   y int
 }
 
-function Take_Action_PG(agent_coordinate: Coordinate, stations_coordinates: Coordinate[], zones: Zone_PG[], child_conditions: Child_Condition_PG[]?, happenings: Happening[]?) -> Output_PG {
+function Take_Action_PG(agent_coordinate: Coordinate, station_coordinates: Coordinate[], zones: Zone_PG[], child_conditions: Child_Condition_PG[]?, happenings: Happening[]?) -> Output_PG {
     client CustomGPT4o
     prompt #"
       {{ _.role("system") }}
       You are a robot that is supposed to prepare learning station in preschool.
       You can either move to a specific zone by calling a navigation agent that gets you there, prepare a learning station or you can help a child.
-      In order to prepare a learning you must be in the same zone as the learning station.
+      In order to prepare a learning you must be at the exact same coordinates as the learning station.
       Your goal is to prepare all learning stations as fast as possible.
       But you should prioritize fulfilling additional obligations.
       There are two types of obligations: helping children and keeping constraints that may arise from happenings in zones.
@@ -69,15 +69,21 @@ function Take_Action_PG(agent_coordinate: Coordinate, stations_coordinates: Coor
       {{ zones }}
   
       {{ _.role("user") }}
-      You are currently at position {{ agent_coordinate }}.
+      You are currently at position {{ agent_coordinate.x }}, {{ agent_coordinate.y }}.
       The following are the coordinates of the learning stations:
-      {{ stations_coordinates }}
+      {% for coord in station_coordinates %}
+      - Station at {{ coord.x }}, {{ coord.y }}
+        {% endfor %}
       The following lists (if any) the additional obligations (children that need help as well as the happenings in the zones):
-      {{ child_conditions }}
-      {{ happenings }}
-      Double check that your next action does not violate any of the obligations if there are any.
-      Also double check that your strategy is as efficient as possible if you concentrate on preparing learning stations (meaning you should try to minimize unnecessary movements considering your current position).
-      Also double check that if you choose to move, you specify the zone you want to move to. You can not simply "move out of a zone". You always have to move TO a specific zone.
+      {% for child in child_conditions %}
+      - Child {{ child.child_id }} needs help because: {{ child.reason }}
+      - Required action to help: {{ child.required_MAT }}
+      - Child's position: {{ child.coordinate.x }}, {{ child.coordinate.y }}
+      {% endfor %}
+      {% for happening in happenings %}
+      - Happening in zone {{ happening.zone_id }}: {{ happening.reason }}
+      - Required action to conform: {{ happening.required_MAT }}
+      {% endfor %}
       Choose you next action and explicitly state you reasoning behind your decision. 
 
     {{ ctx.output_format }}«
@@ -89,7 +95,7 @@ test take_action_pg_basic {
   functions [Take_Action_PG]
   args {
     agent_coordinate {"x": 1, "y": 1}
-    stations_coordinates [
+    station_coordinates [
       {"x": 3, "y": 2},
       {"x": 5, "y": 4},
       {"x": 2, "y": 6}
@@ -117,7 +123,7 @@ test take_action_pg_child_help {
   functions [Take_Action_PG]
   args {
     agent_coordinate {"x": 1, "y": 1}
-    stations_coordinates [
+    station_coordinates [
       {"x": 3, "y": 2},
       {"x": 5, "y": 4}
     ]
@@ -132,7 +138,7 @@ test take_action_pg_child_help {
         "child_id": "Emma_5",
         "reason": "Child is crying and needs comfort",
         "required_MAT": "provide_emotional_support",
-        "coordinate": "2,3"
+        "coordinate": {"x": 2, "y": 3}
       }
     ]
     happenings null
@@ -143,7 +149,7 @@ test take_action_pg_zone_happening {
   functions [Take_Action_PG]
   args {
     agent_coordinate {"x": 4, "y": 4}
-    stations_coordinates [
+    station_coordinates [
       {"x": 3, "y": 2},
       {"x": 5, "y": 4}
     ]
@@ -175,7 +181,7 @@ test take_action_pg_complex {
   functions [Take_Action_PG]
   args {
     agent_coordinate {"x": 1, "y": 1}
-    stations_coordinates [
+    station_coordinates [
       {"x": 3, "y": 2},
       {"x": 5, "y": 4},
       {"x": 2, "y": 6}
@@ -199,7 +205,7 @@ test take_action_pg_complex {
         "child_id": "Liam_4",
         "reason": "Child fell down and is hurt",
         "required_MAT": "provide_first_aid",
-        "coordinate": "6,5"
+        "coordinate": {"x": 6, "y": 5}
       }
     ]
     happenings [

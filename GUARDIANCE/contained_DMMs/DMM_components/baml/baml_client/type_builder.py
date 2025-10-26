@@ -238,7 +238,7 @@ class HappeningAst:
     def __init__(self, tb: type_builder.TypeBuilder):
         _tb = tb._tb # type: ignore (we know how to use this private attribute)
         self._bldr = _tb.class_("Happening")
-        self._properties: typing.Set[str] = set([  "zone",  "reason",  "required_MAT",  ])
+        self._properties: typing.Set[str] = set([  "zone_id",  "reason",  "required_MAT",  ])
         self._props = HappeningProperties(self._bldr, self._properties)
 
     def type(self) -> baml_py.FieldType:
@@ -267,8 +267,8 @@ class HappeningProperties:
     
     
     @property
-    def zone(self) -> type_builder.ClassPropertyViewer:
-        return type_builder.ClassPropertyViewer(self.__bldr.property("zone"))
+    def zone_id(self) -> type_builder.ClassPropertyViewer:
+        return type_builder.ClassPropertyViewer(self.__bldr.property("zone_id"))
     
     @property
     def reason(self) -> type_builder.ClassPropertyViewer:
@@ -375,7 +375,7 @@ class Output_PGAst:
     def __init__(self, tb: type_builder.TypeBuilder):
         _tb = tb._tb # type: ignore (we know how to use this private attribute)
         self._bldr = _tb.class_("Output_PG")
-        self._properties: typing.Set[str] = set([  "type",  "identifier",  "help",  "target_position_coordinates",  ])
+        self._properties: typing.Set[str] = set([  "type",  "identifier",  "help",  "target_coordinate",  ])
         self._props = Output_PGProperties(self._bldr, self._properties)
 
     def type(self) -> baml_py.FieldType:
@@ -416,8 +416,8 @@ class Output_PGProperties:
         return type_builder.ClassPropertyViewer(self.__bldr.property("help"))
     
     @property
-    def target_position_coordinates(self) -> type_builder.ClassPropertyViewer:
-        return type_builder.ClassPropertyViewer(self.__bldr.property("target_position_coordinates"))
+    def target_coordinate(self) -> type_builder.ClassPropertyViewer:
+        return type_builder.ClassPropertyViewer(self.__bldr.property("target_coordinate"))
     
     
 
