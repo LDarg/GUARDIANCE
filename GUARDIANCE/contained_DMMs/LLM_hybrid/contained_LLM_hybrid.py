@@ -62,12 +62,8 @@ class contained_LLM_PG():
         if np.array_equal(agent_coordinate, self.target_coordinate):
             self.target_coordinate = None
         #follow course of action until target reached or normative reasons changed
-        if self.target_coordinate is not None:
-            if not new_plan:
-                action = self.navigate(rl_obs)
-            else:
-                output =self.DMM.LLM.Take_Action_PG(agent_coordinate=DMM_observation["agent_coordinate"], station_coordinates=DMM_observation["station_coordinates"], zones=DMM_observation["zones"], child_conditions=DMM_observation["child_conditions"], happenings=DMM_observation["happenings"])
-                action= self.output_to_action(output, rl_obs)
+        if self.target_coordinate is not None and not new_plan:
+            action = self.navigate(rl_obs)
         else:
             output =self.DMM.LLM.Take_Action_PG(agent_coordinate=DMM_observation["agent_coordinate"], station_coordinates=DMM_observation["station_coordinates"], zones=DMM_observation["zones"], child_conditions=DMM_observation["child_conditions"], happenings=DMM_observation["happenings"])
             action= self.output_to_action(output, rl_obs)
@@ -98,6 +94,9 @@ class contained_LLM_PG():
             if new_guiding_rules != self.guiding_rules:
                 self.guiding_rules = new_guiding_rules
                 action = self.DMM_take_action(rl_obs , extracted_data, True)
+            else:
+                action = self.DMM_take_action(rl_obs , extracted_data, False)
+
         else:
             action = self.DMM_take_action(rl_obs , extracted_data, False)
             #guard_observation = self.data_processor.guard_observation(extracted_data, self.guiding_rules)

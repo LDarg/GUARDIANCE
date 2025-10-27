@@ -323,7 +323,7 @@ class Preschool_Grid(gym.Env):
         #            break
 
         # generate moral goals and happenings with a certain probability
-        if random.random() < 0.15: #0.15
+        if random.random() < 0.5: #0.15
             self.map.generate_moral_goal()
         if random.random() < 0: #0.1
             self.map.generate_happening()
