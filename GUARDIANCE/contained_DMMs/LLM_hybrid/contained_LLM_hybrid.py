@@ -58,12 +58,14 @@ class contained_LLM_PG():
 
         DMM_observation = self.data_processor.DMM_observation(extracted_data, self.guiding_rules)
 
+        # determine if the agent has reached its target position
         agent_coordinate = np.array([DMM_observation["agent_coordinate"]["x"], DMM_observation["agent_coordinate"]["y"]])
         if np.array_equal(agent_coordinate, self.target_coordinate):
             self.target_coordinate = None
         #follow course of action until target reached or normative reasons changed
         if self.target_coordinate is not None and not new_plan:
             action = self.navigate(rl_obs)
+        #if the target is reached or the reasons have changed, ask the LLM for a new action plan
         else:
             output =self.DMM.LLM.Take_Action_PG(agent_coordinate=DMM_observation["agent_coordinate"], station_coordinates=DMM_observation["station_coordinates"], zones=DMM_observation["zones"], child_conditions=DMM_observation["child_conditions"], happenings=DMM_observation["happenings"])
             action= self.output_to_action(output, rl_obs)
@@ -87,16 +89,17 @@ class contained_LLM_PG():
         extracted_data = self.data_processor.extract_relevant_information(self.reasoning_unit.reason_theory, observation, self.static_env_info)
         if self.guiding_rules is None:
             self.guiding_rules = self.reasoning_unit.moral_obligations(extracted_data)
-        test = extracted_data["children"] | extracted_data["happenings"] 
+        #check if normative reasons have changed
         if not extracted_data["children"] | extracted_data["happenings"] == self.normative_reasons:
             self.normative_reasons = extracted_data["children"] | extracted_data["happenings"]
             new_guiding_rules = self.reasoning_unit.moral_obligations(extracted_data)
+            # check if the change in normative reasons enforced an adaptation of the guiding rules
             if new_guiding_rules != self.guiding_rules:
                 self.guiding_rules = new_guiding_rules
+                # let the DMM determine a new course of action that is confomr with the change in guiding rules
                 action = self.DMM_take_action(rl_obs , extracted_data, True)
             else:
                 action = self.DMM_take_action(rl_obs , extracted_data, False)
-
         else:
             action = self.DMM_take_action(rl_obs , extracted_data, False)
             #guard_observation = self.data_processor.guard_observation(extracted_data, self.guiding_rules)
