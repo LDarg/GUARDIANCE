@@ -95,10 +95,10 @@ class Preschool_Text(gym.Wrapper):
 
             # generate moral goals and happenings with a certain probability
             # SIMPLIFICATION: ensure that for every condition, there is only one instance of a child with that condition
-            if random.random() < 0.2:
+            if random.random() < 0.5:
                 if len(self.map.children) < len(self.map.config.conditions):
                     self.map.generate_moral_goal_unique()
-            if random.random() < 0.1:
+            if random.random() < 0.5:
                 self.map.generate_happening()
 
             observation = self.observation()

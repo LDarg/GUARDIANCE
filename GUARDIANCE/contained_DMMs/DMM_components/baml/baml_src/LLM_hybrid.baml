@@ -46,6 +46,9 @@ class Output_PG {
   target_coordinate int[]? @description(#"
     the coordinate, you want to move to by calling the navigation agent (needed iff type is move)
   "#)
+  reasoning string @description(#"
+    the reasoning behind your decision
+  "#)
 }
 
 class Coordinate {

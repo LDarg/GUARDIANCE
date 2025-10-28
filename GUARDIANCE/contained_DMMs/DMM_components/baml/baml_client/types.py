@@ -80,11 +80,13 @@ class Output_PG(BaseModel):
     identifier: typing.Optional[str] = None
     help: typing.Optional[str] = None
     target_coordinate: typing.Optional[typing.List[int]] = None
+    reasoning: str
 
 class Output_PT(BaseModel):
     type: typing.Union[typing_extensions.Literal['move'], typing_extensions.Literal['prepare'], typing_extensions.Literal['help']]
     identifier: typing.Optional[str] = None
     help: typing.Optional[str] = None
+    reasoning: str
 
 class Zone(BaseModel):
     zone_id: str

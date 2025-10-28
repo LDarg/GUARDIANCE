@@ -375,7 +375,7 @@ class Output_PGAst:
     def __init__(self, tb: type_builder.TypeBuilder):
         _tb = tb._tb # type: ignore (we know how to use this private attribute)
         self._bldr = _tb.class_("Output_PG")
-        self._properties: typing.Set[str] = set([  "type",  "identifier",  "help",  "target_coordinate",  ])
+        self._properties: typing.Set[str] = set([  "type",  "identifier",  "help",  "target_coordinate",  "reasoning",  ])
         self._props = Output_PGProperties(self._bldr, self._properties)
 
     def type(self) -> baml_py.FieldType:
@@ -419,6 +419,10 @@ class Output_PGProperties:
     def target_coordinate(self) -> type_builder.ClassPropertyViewer:
         return type_builder.ClassPropertyViewer(self.__bldr.property("target_coordinate"))
     
+    @property
+    def reasoning(self) -> type_builder.ClassPropertyViewer:
+        return type_builder.ClassPropertyViewer(self.__bldr.property("reasoning"))
+    
     
 
 
@@ -426,7 +430,7 @@ class Output_PTAst:
     def __init__(self, tb: type_builder.TypeBuilder):
         _tb = tb._tb # type: ignore (we know how to use this private attribute)
         self._bldr = _tb.class_("Output_PT")
-        self._properties: typing.Set[str] = set([  "type",  "identifier",  "help",  ])
+        self._properties: typing.Set[str] = set([  "type",  "identifier",  "help",  "reasoning",  ])
         self._props = Output_PTProperties(self._bldr, self._properties)
 
     def type(self) -> baml_py.FieldType:
@@ -465,6 +469,10 @@ class Output_PTProperties:
     @property
     def help(self) -> type_builder.ClassPropertyViewer:
         return type_builder.ClassPropertyViewer(self.__bldr.property("help"))
+    
+    @property
+    def reasoning(self) -> type_builder.ClassPropertyViewer:
+        return type_builder.ClassPropertyViewer(self.__bldr.property("reasoning"))
     
     
 

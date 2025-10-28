@@ -62,11 +62,13 @@ class Output_PG(BaseModel):
     identifier: typing.Optional[str] = None
     help: typing.Optional[str] = None
     target_coordinate: typing.Optional[typing.List[int]] = None
+    reasoning: typing.Optional[str] = None
 
 class Output_PT(BaseModel):
     type: typing.Optional[typing.Union[str, str, str]] = None
     identifier: typing.Optional[str] = None
     help: typing.Optional[str] = None
+    reasoning: typing.Optional[str] = None
 
 class Zone(BaseModel):
     zone_id: typing.Optional[str] = None

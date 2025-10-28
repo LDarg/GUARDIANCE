@@ -59,6 +59,7 @@ class contained_LLM_PG():
         DMM_observation = self.data_processor.DMM_observation(extracted_data, self.guiding_rules)
 
         # determine if the agent has reached its target position
+        #TODO: ab hier ist es vom DMM abhängig 
         agent_coordinate = np.array([DMM_observation["agent_coordinate"]["x"], DMM_observation["agent_coordinate"]["y"]])
         if np.array_equal(agent_coordinate, self.target_coordinate):
             self.target_coordinate = None
@@ -86,6 +87,7 @@ class contained_LLM_PG():
             return (LLM_Output.type, uuid.UUID(LLM_Output.identifier), LLM_Output.help)
         
     #IMPORTANT: in der grid-world wichtiger, dass keine unnötigen anfragen in jedem schritt an LLM gestellt, weil die trajectories um ein ziel zu erreicehn viel länger sind (viele states, in denen unntige anfragen gestellt werden würden)
+    # TODO: das ist nicht abhängig vom konkreten DMM?
     def take_action(self, rl_obs, observation):
         extracted_data = self.data_processor.extract_relevant_information(self.reasoning_unit.reason_theory, observation, self.static_env_info)
         if self.guiding_rules is None:

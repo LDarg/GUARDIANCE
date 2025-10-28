@@ -57,7 +57,7 @@ class MAT_mapping_PT(MAT_Mapping):
                 (MAT[1] for MAT in MATs if MAT[0] == "Stay_out_of_the_zone"),
                 None
             )
-            other_zone = next(zone for zone in observation["zone_ids"] if zone != forbidden_zone)
+            other_zone = next(zone["zone_id"] for zone in observation["zone_ids"] if zone != forbidden_zone)
             return ("move", uuid.UUID(other_zone))
     
     """

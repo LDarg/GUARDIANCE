@@ -86,7 +86,7 @@ class MAT_mapping_PG(MAT_Mapping):
                 #if np.equal(child_coordinates, extracted_data["agent_coordinate"]):
                    # continue
                 #child_zone_id = extracted_data["children"][rule[1]]["zone_id"] 
-                if child_coordinate in forbidden_zone_coord:
+                if any(np.array_equal(child_coordinate, coord) for coord in forbidden_zone_coord):
                     return True
             
                 #rule requires the agent to help a child

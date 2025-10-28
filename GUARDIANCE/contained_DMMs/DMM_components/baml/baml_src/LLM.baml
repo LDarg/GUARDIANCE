@@ -49,6 +49,9 @@ class Output_PT {
   help string? @description(#"
     the action through which you help a child
   "#)
+  reasoning string @description(#"
+    the reasoning behind your decision
+  "#)
 }
 
 function Take_Action_Preschool(agent_zone: Zone, station_zones: Zone[], zone_ids: Zone[],child_conditions: Child_Condition_PT[]?, happenings: Happening_PT[]?) -> Output_PT {
