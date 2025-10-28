@@ -85,6 +85,7 @@ class contained_LLM_PG():
         elif LLM_Output.type == "help":
             return (LLM_Output.type, uuid.UUID(LLM_Output.identifier), LLM_Output.help)
         
+    #IMPORTANT: in der grid-world wichtiger, dass keine unnötigen anfragen in jedem schritt an LLM gestellt, weil die trajectories um ein ziel zu erreicehn viel länger sind (viele states, in denen unntige anfragen gestellt werden würden)
     def take_action(self, rl_obs, observation):
         extracted_data = self.data_processor.extract_relevant_information(self.reasoning_unit.reason_theory, observation, self.static_env_info)
         if self.guiding_rules is None:
@@ -96,7 +97,7 @@ class contained_LLM_PG():
             # check if the change in normative reasons enforced an adaptation of the guiding rules
             if new_guiding_rules != self.guiding_rules:
                 self.guiding_rules = new_guiding_rules
-                # let the DMM determine a new course of action that is confomr with the change in guiding rules
+                # let the DMM determine a new course of action that is conform with the change in guiding rules
                 action = self.DMM_take_action(rl_obs , extracted_data, True)
             else:
                 action = self.DMM_take_action(rl_obs , extracted_data, False)

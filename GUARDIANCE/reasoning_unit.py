@@ -80,7 +80,7 @@ class ReasoningUnit():
         # returns all groundings of all triggered rules (all rules in the reason whose antecedence holds true together with all their truthmakers)
         groundings  = self.groundings(self.reason_theory, extracted_data)
 
-        #check if chosen scenario (course of action followed so far) is still a proper scenario and follow it further if yes
+        #check if chosen scenario (course of action followed so far) is still a proper scenario and follow it further if it is
         if self.chosen_scenario in groundings and self.compute_binding(self.chosen_scenario, groundings, extracted_data):
             for rule in self.chosen_scenario:
                 moral_obligations.append(rule)

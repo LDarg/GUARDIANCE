@@ -18,6 +18,7 @@ def navigate(env, agent):
 
     while True:
         rl_obs, info = env.reset()
+        agent.static_env_info = env.static_facts()
 
         terminated = False
         truncated = False
@@ -42,6 +43,5 @@ env = gym.make("Preschool-v0")
 set_rules(agent)
 agent.reasoning_unit.log_reason_theory(logger)
 
-agent.static_env_info = env.static_facts()
 # start navigation
 navigate(env, agent)

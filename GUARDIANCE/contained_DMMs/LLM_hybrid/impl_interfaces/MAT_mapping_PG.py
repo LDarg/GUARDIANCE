@@ -31,6 +31,8 @@ class MAT_mapping_PG(MAT_Mapping):
             if action == ("move", MAT[1]):
                 return True
         else:
+            #TODO: das nur für die children machen, die MATs sind
+            # wird eigenltich gemacht???? wo ist hier der Fehler? 
             child_zone = next(child_condition["zone_id"] for child_condition in observation["child_conditions"] if uuid.UUID(child_condition["child_id"]) == MAT[1])
             #agent does not move to the zone where the child is
             if child_zone:
@@ -71,7 +73,7 @@ class MAT_mapping_PG(MAT_Mapping):
         forbidden_zones = []
         for rule in set_of_rules:
             if rule[0][1] == "Stay_out_of_the_zone":
-                forbidden_zones += [zone for zone in extracted_data["zones"] if zone == rule[1]]
+                forbidden_zones += [zone for zone in extracted_data["zones"].values() if zone["zone_id"] == rule[1]]
         if len(forbidden_zones) >= 2:
             return True
         forbidden_zone_coord = [coord for zone in forbidden_zones for coord in zone["coordinates"]]
@@ -93,17 +95,17 @@ class MAT_mapping_PG(MAT_Mapping):
                 else:
                     required_action_rule = ("help", rule[0][1])
 
-            if required_action:
-                if required_action[0] != required_action_rule[0]:
-                    return True
-                elif required_action[0] == "move":
-                    if not np.equal(required_action[1], required_action_rule[1]).all():
+                if required_action:
+                    if required_action[0] != required_action_rule[0]:
                         return True
-                elif required_action != required_action_rule:
-                    return True
+                    elif required_action[0] == "move":
+                        if not np.equal(required_action[1], required_action_rule[1]).all():
+                            return True
+                    elif required_action != required_action_rule:
+                        return True
 
-            else:
-                required_action = required_action_rule
+                else:
+                    required_action = required_action_rule
         return False
     
     

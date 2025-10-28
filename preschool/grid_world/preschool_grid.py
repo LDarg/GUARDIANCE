@@ -227,10 +227,11 @@ class Preschool_Grid(gym.Env):
     
     def static_facts(self):
         return {
-            "zones": [(zone.id, zone.coordinates) for zone in self.map.zones],
+            "zones": {zone.id: {"zone_id": zone.id, "coordinates": zone.coordinates} for zone in self.map.zones},
             "size": (self.map.width, self.map.height)
         }
-    
+                #"zones": [(zone.id, zone.coordinates) for zone in self.map.zones],
+    #TODO: remove these functions (unneccessary)
     """
     functions for handling positions
     """
@@ -306,26 +307,10 @@ class Preschool_Grid(gym.Env):
                         self.map.children.remove(child)
                         break
 
-        # exceute the action if it is helping a person or preparing a learning station
-        #if action == 4:
-        #    to_remove = []
-        #    for child in list(self.map.children):  # iterate over a copy
-        #        if np.equal(self.agent_coordinates, child.coordinates).all():
-        #            to_remove.append(child)
-        #    for child in to_remove:
-        #        self.map.delete_moral_goal(child)
-#
-        #    for learning_station in self.map.learning_stations:
-        #        if np.equal(self.agent_coordinates, learning_station.coordinates).all():
-        #            learning_station.progress()
-        #            if learning_station.finished():
-        #                self.map.learning_stations.remove(learning_station)
-        #            break
-
         # generate moral goals and happenings with a certain probability
-        if random.random() < 0.5: #0.15
+        if random.random() < 0.15: #0.15
             self.map.generate_moral_goal()
-        if random.random() < 0: #0.1
+        if random.random() < 1: #0.1
             self.map.generate_happening()
 
         observation = self.observation()
@@ -467,10 +452,7 @@ class Preschool_Grid(gym.Env):
 
         for fact in facts["children"]:
             text_surface = font.render(fact[1]+": " +str(fact[2]), True, (255, 255, 255))
-            self.window.blit(text_surface, (10, y_offset))   # <-- still using self.window here
+            self.window.blit(text_surface, (10, y_offset)) 
             y_offset += text_surface.get_height() + 5
-
-        # Blit grid to window
-        #self.window.blit(canvas, (0, 0))
         return canvas
 

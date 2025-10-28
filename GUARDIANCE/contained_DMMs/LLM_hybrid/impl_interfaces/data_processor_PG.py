@@ -27,6 +27,8 @@ class Data_Processor_PG(Data_Processor):
             for item in observation["children"]
             if item[1].replace(" ", "_") in reasons
         }
+        if observation["happenings"]:
+            pass
         relevant_data["happenings"] = {
             item[0]: {
                 "zone_id": item[0],
@@ -80,14 +82,16 @@ class Data_Processor_PG(Data_Processor):
             DMM_input["reasons_changed"] = False
         self.former_reasons = normative_reasons
 
+        #test = [zone for zone in data["zones"].values()]
+
         DMM_input["zones"] = [
             {
-                "zone_id": str(zone_id),
+                "zone_id": str( zone["zone_id"]),
                 "coordinates": [
-                    {"x": coord[0], "y": coord[1]} for coord in coordinates
+                    {"x": coord[0], "y": coord[1]} for coord in zone["coordinates"] 
                 ],
             }
-            for zone_id, coordinates in data["zones"]
+            for zone in data["zones"].values()
         ]
         DMM_input["station_coordinates"] = [{"x": coordinate[0], "y": coordinate[1]} for coordinate in data["station_coordinates"]]
         DMM_input["agent_coordinate"] = {"x": int(data["agent_coordinate"][0]), "y": int(data["agent_coordinate"][1])}
