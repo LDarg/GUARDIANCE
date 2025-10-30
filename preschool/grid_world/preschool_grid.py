@@ -230,20 +230,6 @@ class Preschool_Grid(gym.Env):
             "zones": {zone.id: {"zone_id": zone.id, "coordinates": zone.coordinates} for zone in self.map.zones},
             "size": (self.map.width, self.map.height)
         }
-                #"zones": [(zone.id, zone.coordinates) for zone in self.map.zones],
-    #TODO: remove these functions (unneccessary)
-    """
-    functions for handling positions
-    """
-    def to_2d_coordinates(self, index, width):
-        row = index // width
-        col = index % width
-        return [col, row]
-    
-    def to_1d_index(self, position):
-        position_1d = position[1] * self.map.width + position[0]
-        return position_1d
-
     
     def random_agent_pos(self, random_gen):
         # choose the agent's location randomly and ensure that the agent doesn't spawn at the goal position
