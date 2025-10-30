@@ -10,7 +10,7 @@ logging.basicConfig(filename='demo_LLM.log',
                     format='%(asctime)s %(levelname)s [%(filename)s:%(lineno)d] %(message)s',
                     level=logging.DEBUG)
 
-logging.info("Starting LLM agent demo")
+logging.info("Starting LLM_hybrid agent demo")
 
 def navigate(env, agent):
     env.set_render_mode("human")

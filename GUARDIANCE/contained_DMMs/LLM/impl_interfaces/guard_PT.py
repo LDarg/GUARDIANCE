@@ -27,4 +27,5 @@ class Guard_PT(Guard):
         pass
 
     def retrigger(self, action, violated_obligation):
-        self.DMM.Rethink_Choice_Of_Action(action=action, obligation=violated_obligation)
+        pass
+        #self.DMM.Rethink_Choice_Of_Action(action=action, obligation=violated_obligation)

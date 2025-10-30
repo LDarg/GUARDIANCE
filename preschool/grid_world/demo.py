@@ -26,7 +26,7 @@ def demo(env):
             #env.render()
             # randomly choose an action
             action = env.action_space.sample()
-            state, reward, terminated, truncated, _ = env.step(action)
+            state, reward, terminated, truncated, _ = env.step((action, "move"))
             print(f"Action: {action}, Reward: {reward}, State: \n {state}")
 
 if __name__ == '__main__':
