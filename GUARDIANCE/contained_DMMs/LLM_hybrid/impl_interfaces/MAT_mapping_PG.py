@@ -13,33 +13,55 @@ class MAT_mapping_PG(MAT_Mapping):
         # config is needed for retrieving the infomration which action is required for which child condition 
         self.config = config
 
+    # self.action_to_direction = {
+    #        0: self.directions[0], #right
+    #        1: self.directions[1], #down
+    #        2: self.directions[2], #left
+    #        3: self.directions[3], #up
+    #    }
+    
+    def manhattan_distance(array1, array2):
+        return np.sum(np.abs(array1 - array2))
+
     """
     PRESCHOOL: determining the set of allowed actions for one MAT rule-based hardcoded according to the 1 to 1  mapping
     """
     def obligation_violated(self, action, MAT, observation):
 
         if MAT[0] == "Stay_out_of_the_zone":
-            #agent plans to not move out of forbidden zone
-            if observation["agent_zone"]["zone_id"] == MAT[1]:
-                other_zones = [elem for elem in observation["zone_ids"] if elem != MAT[1]]
-
-                #TODO fix this for grid version (check if its movement get its closer to being out of the zone)
-                if not any(action == ("move", other_zone) for other_zone in other_zones):
+            y_coordinate_boundary = 3
+            zone = next(zone for zone in observation["zones"] if zone["zone_id"] == MAT[1])
+            if any(np.array_equal(coord, np.array([0, 0])) for coord in zone["coordinates"]):
+                #agent is in zone and does not move out of it
+                if observation["agent_coordinate"] in zone["coordinates"] and action != ("move", 0):
                     return True
-            #agent plans to move into the forbidden zone
-
-            if action == ("move", MAT[1]):
-                return True
+                #agent moves into zone
+                if observation["agent_coordinate"][0] == y_coordinate_boundary+1 and action == ("move", 2):
+                    return True
+            else:
+                if observation["agent_coordinate"] in zone["coordinates"] and action != ("move", 2):
+                    return True
+                if observation["agent_coordinate"][0] == y_coordinate_boundary and action == ("move", 0):
+                    return True
+                
         else:
-            #TODO: das nur für die children machen, die MATs sind
-            # wird eigenltich gemacht???? wo ist hier der Fehler? 
-            child_zone = next(child_condition["zone_id"] for child_condition in observation["child_conditions"] if uuid.UUID(child_condition["child_id"]) == MAT[1])
+
+            child_coordinate = next(child_condition["coordinate"] for child_condition in observation["child_conditions"] if child_condition["child_id"] == MAT[1])
             #agent does not move to the zone where the child is
-            if child_zone:
-                if observation["agent_zone"]["zone_id"] != child_zone and action != ("move", uuid.UUID(child_zone)):
+            if action == ("move", 0) and not child_coordinate[0] > observation["agent_coordinate"][0]:
+                return True
+            if action == ("move", 2) and not child_coordinate[0] < observation["agent_coordinate"][0]:
+                return True
+            if action == ("move", 1) and not child_coordinate[1] > observation["agent_coordinate"][1]:
+                return True
+            if action == ("move", 3) and not child_coordinate[1] < observation["agent_coordinate"][1]:
+                return True
+            if np.equal(child_coordinate, observation["agent_coordinate"]).all() and action[0] != "help":
                     return True
-                elif observation["agent_zone"]["zone_id"] == child_zone and action != ("help", MAT[1], MAT[0]):
-                    return True
+            if action[0] == "help" and not np.equal(child_coordinate, observation["agent_coordinate"]).all():
+                return True
+            if action[0] == "prepare":
+                return True
             
         return False
     

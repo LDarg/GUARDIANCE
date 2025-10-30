@@ -4,7 +4,7 @@ from GUARDIANCE.contained_DMMs.LLM_hybrid.impl_interfaces.MAT_mapping_PG import 
 from preschool.config import Config
 from GUARDIANCE.contained_DMMs.LLM_hybrid.impl_interfaces.data_processor_PG import Data_Processor_PG
 import uuid
-from GUARDIANCE.contained_DMMs.LLM.impl_interfaces.guard_PT import Guard_PT
+from GUARDIANCE.contained_DMMs.LLM_hybrid.impl_interfaces.guard_PG import Guard_PG
 from GUARDIANCE.contained_DMMs.DMM_components.baml.baml_client import b
 import torch
 import numpy as np
@@ -26,7 +26,7 @@ class contained_LLM_PG():
         self.mat_mapping = MAT_mapping_PG(self.config)
         self.data_processor = Data_Processor_PG()
         self.reasoning_unit = ReasoningUnit(self.mat_mapping, self.data_processor)
-        self.guard = Guard_PT(self.DMM, self.mat_mapping)
+        self.guard = Guard_PG(self.DMM, self.mat_mapping)
         self.static_env_info = None
         self.target_coordinate = None
         self.guiding_rules = None
@@ -105,8 +105,8 @@ class contained_LLM_PG():
                 action = self.DMM_take_action(rl_obs , extracted_data, False)
         else:
             action = self.DMM_take_action(rl_obs , extracted_data, False)
-            #guard_observation = self.data_processor.guard_observation(extracted_data, self.guiding_rules)
-            #action = self.guard.ensure_conformity(action, self.guiding_rules, guard_observation)
+            guard_observation = self.data_processor.guard_observation(extracted_data, self.guiding_rules)
+            action = self.guard.ensure_conformity(action, self.guiding_rules, guard_observation)
         return action
                 
         #self.normative_reasons = extracted_data["children"] | extracted_data["happenings"]

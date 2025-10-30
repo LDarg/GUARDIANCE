@@ -76,13 +76,6 @@ class Data_Processor_PG(Data_Processor):
 
         normative_reasons= {"child_conditions": child_conditions, "happenings": happenings}
         DMM_input = normative_reasons
-        if normative_reasons != self.former_reasons:
-            DMM_input["reasons_changed"] = True
-        else :
-            DMM_input["reasons_changed"] = False
-        self.former_reasons = normative_reasons
-
-        #test = [zone for zone in data["zones"].values()]
 
         DMM_input["zones"] = [
             {
@@ -109,17 +102,26 @@ class Data_Processor_PG(Data_Processor):
     def guard_observation(self, data, guiding_rules):
         data = copy.deepcopy(self.extracted_information)
 
-        child_conditions = [{"child_id": str(data["children"][rule[1]]["child_id"]),
-                             "zone_id": str(data["children"][rule[1]]["zone_id"]),
-                            }
+        child_conditions = [{"child_id": data["children"][rule[1]]["child_id"],
+                             "reason": rule[0][0],
+                             "required_MAT": rule[0][1],
+                             "coordinate": [data["children"][rule[1]]["coordinate"][0], data["children"][rule[1]]["coordinate"][1]]
+                             }
                             for rule in guiding_rules if rule[0][0] in [child["description"] for child in data["children"].values()]]
         
-        happenings = [{"zone_id": str(data["happenings"][rule[1]]["zone_id"]),
-                        "required_MAT": rule[0][1],
-                        "zone_name": data["happenings"][rule[1]]["zone_name"]}
-                       for rule in guiding_rules if rule[0][0] in [zone["description"] for zone in data["zones"].values()]]
+        happenings = [{"zone_id": data["zones"][rule[1]]["zone_id"],
+                  "reason": rule[0][0],
+                  "required_MAT": rule[0][1]}
+                  for rule in guiding_rules if rule[0][0] in [happening["description"] for happening in data["happenings"].values()]]
+        
         guard_observation = {"child_conditions": child_conditions, "happenings": happenings}
-        guard_observation["agent_zone"] = {"zone_id": str(data["agent_zone"])}
-        guard_observation["zone_ids"] = [{"zone_id": str(zone_id)} for zone_id in data["zone_ids"]]
+        guard_observation["agent_coordinate"] = data["agent_coordinate"]
+        guard_observation["zones"] = [
+            {
+                "zone_id": zone["zone_id"],
+                "coordinates": zone["coordinates"] 
+            }
+            for zone in data["zones"].values()
+        ]
 
         return guard_observation
