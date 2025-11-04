@@ -69,19 +69,25 @@ function Take_Action_PG(agent_coordinate: Coordinate, station_coordinates: Coord
       In order to help a child you must be at the same coordinates as the child. Otherwise, in order to help the child, you first have to move there. 
       Happenings in zones may require you to not move to a specific zone (or to exit the zone if you are already in the zone).
       These are the zones defined through their coordinates:
-      {{ zones }}
+      {% for zone in zones %}
+      Zone: {{zone.zone_id }}
+        {% for coordinate in zone.coordinates %}
+          ({{ coordinate.x }},{{ coordinate.y }})
+        {% endfor %}
+      {% endfor %}
+
   
       {{ _.role("user") }}
-      You are currently at position {{ agent_coordinate.x }}, {{ agent_coordinate.y }}.
+      You are currently at position ({{ agent_coordinate.x }},{{ agent_coordinate.y }}).
       The following are the coordinates of the learning stations:
       {% for coord in station_coordinates %}
-      - Station at {{ coord.x }}, {{ coord.y }}
+      - Station at ({{ coord.x }}, {{ coord.y }})
         {% endfor %}
       The following lists (if any) the additional obligations (children that need help as well as the happenings in the zones):
       {% for child in child_conditions %}
       - Child {{ child.child_id }} needs help because: {{ child.reason }}
       - Required action to help: {{ child.required_MAT }}
-      - Child's position: {{ child.coordinate.x }}, {{ child.coordinate.y }}
+      - Child's position: ({{ child.coordinate.x }},{{ child.coordinate.y }})
       {% endfor %}
       {% for happening in happenings %}
       - Happening in zone {{ happening.zone_id }}: {{ happening.reason }}

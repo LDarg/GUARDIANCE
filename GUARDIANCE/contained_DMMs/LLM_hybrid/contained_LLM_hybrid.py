@@ -31,6 +31,7 @@ class contained_LLM_PG():
         self.target_coordinate = None
         self.guiding_rules = None
         self.normative_reasons = {}
+        self.course_correction = False
 
     def set_target_rl(self, rl_obs):
         #width = self.static_env_info["size"][0]
@@ -105,8 +106,11 @@ class contained_LLM_PG():
                 action = self.DMM_take_action(rl_obs , extracted_data, False)
         else:
             action = self.DMM_take_action(rl_obs , extracted_data, False)
-            guard_observation = self.data_processor.guard_observation(extracted_data, self.guiding_rules)
-            action = self.guard.ensure_conformity(action, self.guiding_rules, guard_observation)
+        guard_observation = self.data_processor.guard_observation(extracted_data, self.guiding_rules)
+        approved_action = self.guard.ensure_conformity(action, self.guiding_rules, guard_observation)
+        if approved_action != action:
+            self.course_correction = True
+            action = approved_action
         return action
                 
         #self.normative_reasons = extracted_data["children"] | extracted_data["happenings"]
