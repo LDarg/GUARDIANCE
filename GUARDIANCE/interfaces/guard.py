@@ -15,6 +15,7 @@ class Guard(ABC):
                     #action = self.retrigger(action, guiding_rules, observation, DMM_observation)
                 # if retriggering the DMM still does not provide the agent with a useful approach, select a default action and explain to the DMM why it was selected
                 action = self.mat_mapping.default_action( MATs, observation)
+                return action
 
         return action
     
