@@ -24,7 +24,7 @@ class MAT_mapping_PG(MAT_Mapping):
         return np.sum(np.abs(array1 - array2))
 
     """
-    PRESCHOOL: determining the set of allowed actions for one MAT rule-based hardcoded according to the 1 to 1  mapping
+    checks if the agent exits the zone if currently inside and does not enter the zone if currently outside
     """
     def obligation_violated(self, action, MAT, observation):
 
@@ -48,25 +48,6 @@ class MAT_mapping_PG(MAT_Mapping):
                 if observation["agent_coordinate"][0] == y_coordinate_boundary and action == ("move", 0):
                     return True
                 
-        else:
-            child_coordinate = next(child_condition["coordinate"] for child_condition in observation["child_conditions"] if child_condition["child_id"] == MAT[1])
-            #agent does not move to the position of the child
-            if action == ("move", 0) and not child_coordinate[0] > observation["agent_coordinate"][0]:
-                return True
-            if action == ("move", 2) and not child_coordinate[0] < observation["agent_coordinate"][0]:
-                return True
-            if action == ("move", 1) and not child_coordinate[1] > observation["agent_coordinate"][1]:
-                return True
-            if action == ("move", 3) and not child_coordinate[1] < observation["agent_coordinate"][1]:
-                return True
-            if np.equal(child_coordinate, observation["agent_coordinate"]).all() and action[0] != "help":
-                    return True
-            if action[0] == "help" and not np.equal(child_coordinate, observation["agent_coordinate"]).all():
-                return True
-            if action[0] == "prepare":
-                return True
-            
-        return False
     
     """
     rules for what needs to be done given a certain set of MATs (encode the correct next primitive action for every situation possible)
