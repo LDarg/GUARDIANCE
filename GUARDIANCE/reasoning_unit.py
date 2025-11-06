@@ -17,6 +17,8 @@ class ReasoningUnit():
         self.threshold_waiting = 0.8
         self.chosen_scenario = None
 
+        self.conflicted = set()
+
     @classmethod
     def int_to_subscript(self, number):
         subscript_offset = 8320  
@@ -91,12 +93,36 @@ class ReasoningUnit():
             if self.compute_binding(set(scenario), groundings, extracted_data):
                 proper_scenarios.append(set(scenario))
 
-        #if there are several proper scenarios, let the agent choose one randomly; (buridan's ass)
+        #among the proper scenarios, check whether goals should be prioritized
+        for scenario in proper_scenario:
+            for rule in scenario:
+                if self.reason_theory.get_edge_data(rule[0][0], rule[0][1])['subclass'] == 'goal':
+                    if self.trade_off_priorities(rule, scenario):
+                        proper_scenarios.remove(scenario)
+                        
         proper_scenario = random.choice(list(proper_scenarios))
         self.chosen_scenario = proper_scenario
         for rule in proper_scenario:
             moral_obligations.append(rule)
         return moral_obligations
+    
+    
+    def trade_off_priorities(self, rule, scenario):
+        edge_data = self.reason_theory.get_edge_data(rule[0], rule[1], default={})
+        trade_off_prios = edge_data.get('prio_trade_off', [])
+
+        # if there is another rule of lesser priority in the scenario than the rule, then the scenario is not selectable
+        if any(other_rule in scenario for other_rule in trade_off_prios):
+            return True
+
+        if not trade_off_prios:
+            return False
+
+        for next_rule in trade_off_prios:
+            if self.trade_off_priorities(next_rule, scenario):
+                return True
+
+        return False
     
     """
     Returns rules whose antecedences hold true  given the background information and the conclusions of rules in the reason theory.
