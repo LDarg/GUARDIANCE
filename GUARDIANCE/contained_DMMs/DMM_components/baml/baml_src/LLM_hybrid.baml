@@ -61,12 +61,12 @@ function Take_Action_PG(agent_coordinate: Coordinate, station_coordinates: Coord
     prompt #"
       {{ _.role("system") }}
       You are a robot that is supposed to prepare learning station in preschool.
-      You can either move to a specific zone by calling a navigation agent that gets you there, prepare a learning station or you can help a child.
+      You can either move to a specific zone by calling a navigation agent that gets you there, prepare a learning station, can help a child or you can idle.
       In order to prepare a learning you must be at the exact same coordinates as the learning station.
       Your goal is to prepare all learning stations as fast as possible.
       But you should prioritize fulfilling additional obligations.
       There are two types of obligations: helping children and keeping constraints that may arise from happenings in zones.
-      In order to help a child you must be at the same coordinates as the child. Otherwise, in order to help the child, you first have to move there. 
+      In order to help a child you must be at the exact same coordinates as the child. Otherwise, in order to help the child, you first have to move to the exact same coordinates. It is not enough to be positioned nearby the child. 
       Happenings in zones may require you to not move to a specific zone (or to exit the zone if you are already in the zone).
       These are the zones defined through their coordinates:
       {% for zone in zones %}

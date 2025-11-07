@@ -17,14 +17,16 @@ def set_rules(agent):
     
     # add default rules with a hard-coded order among them
     agent.reasoning_unit.reason_theory.add_edge('A child is crying and needs comfort'.replace(" ", "_"), 'Comfort the child'.replace(" ", "_"), 
-                                                    lower_order=set(), prio_trade_off=set(),
+                                                    lower_order=set(), 
+                                                    prio_trade_off=set(),
                                                     name=f"δ{get_edge_number_as_index(agent)}")
     agent.reasoning_unit.reason_theory.add_edge('A child has fallen down and needs help to get up'.replace(" ", "_"), 'Help the child stand up'.replace(" ", "_"), 
-                                                    lower_order=set(), prio_trade_off=set(), 
+                                                    lower_order=set(), 
+                                                    prio_trade_off=(('A child is crying and needs comfort'.replace(" ", "_"), 'Comfort the child'.replace(" ", "_")),),
                                                     name=f"δ{get_edge_number_as_index(agent)}")
     agent.reasoning_unit.reason_theory.add_edge('A child has scratched its knee and needs band-aids'.replace(" ", "_"), 'Doctor the child'.replace(" ", "_"), 
-                                                    lower_order=set(), prio_trade_off=('A child is crying and needs comfort'.replace(" ", "_"), 'Comfort the child'.replace(" ", "_"), 
-                                                                                       'A child has fallen down and needs help to get up'.replace(" ", "_"), 'Help the child stand up'.replace(" ", "_")),
+                                                    lower_order=set(), 
+                                                    prio_trade_off=(('A child has fallen down and needs help to get up'.replace(" ", "_"), 'Help the child stand up'.replace(" ", "_")),),
                                                     name=f"δ{get_edge_number_as_index(agent)}")
     agent.reasoning_unit.reason_theory.add_edge('Children have finished their work early and are now running around wildly'.replace(" ", "_"), 'Stay out of the zone'.replace(" ", "_"), 
                                                     lower_order=(('A child is crying and needs comfort'.replace(" ", "_"), 'Comfort the child'.replace(" ", "_")),

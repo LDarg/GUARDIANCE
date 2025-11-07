@@ -86,6 +86,8 @@ class contained_LLM_PG():
             return (LLM_Output.type, None)
         elif LLM_Output.type == "help":
             return (LLM_Output.type, uuid.UUID(LLM_Output.identifier), LLM_Output.help)
+        elif LLM_Output.type == "idle":
+            return (LLM_Output.type, None)
         
     #IMPORTANT: in der grid-world wichtiger, dass keine unnötigen anfragen in jedem schritt an LLM gestellt, weil die trajectories um ein ziel zu erreicehn viel länger sind (viele states, in denen unntige anfragen gestellt werden würden)
     # TODO: das ist nicht abhängig vom konkreten DMM?

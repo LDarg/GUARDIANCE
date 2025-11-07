@@ -93,12 +93,18 @@ class ReasoningUnit():
             if self.compute_binding(set(scenario), groundings, extracted_data):
                 proper_scenarios.append(set(scenario))
 
-        #among the proper scenarios, check whether goals should be prioritized
-        for scenario in proper_scenario:
-            for rule in scenario:
-                if self.reason_theory.get_edge_data(rule[0][0], rule[0][1])['subclass'] == 'goal':
-                    if self.trade_off_priorities(rule, scenario):
-                        proper_scenarios.remove(scenario)
+        #among the proper scenarios, check whether goals should be prioritized or if the DMM is supposed to follow a stragegy following all goals equally 
+        for scenario in proper_scenarios:
+            for rule in set(scenario):
+                if self.reason_theory.nodes[rule[0][1]].get('subclass') == 'goal':
+                    while True:
+                        less_prio_goal = self.trade_off_priorities(rule[0], scenario)
+                        if less_prio_goal:
+                            rule_to_remove = next((rule for rule in scenario if rule[0][0] == less_prio_goal[0]), None)
+                            if rule_to_remove:
+                                scenario.remove(rule_to_remove)
+                            continue
+                        break
                         
         proper_scenario = random.choice(list(proper_scenarios))
         self.chosen_scenario = proper_scenario
@@ -108,19 +114,25 @@ class ReasoningUnit():
     
     
     def trade_off_priorities(self, rule, scenario):
-        edge_data = self.reason_theory.get_edge_data(rule[0], rule[1], default={})
+        edge_data = self.reason_theory.get_edge_data(rule[0], rule[1])
         trade_off_prios = edge_data.get('prio_trade_off', [])
-
-        # if there is another rule of lesser priority in the scenario than the rule, then the scenario is not selectable
-        if any(other_rule in scenario for other_rule in trade_off_prios):
-            return True
 
         if not trade_off_prios:
             return False
 
+        for other_rule in scenario:
+            other_rule = other_rule[0]
+            if other_rule in trade_off_prios:
+                return other_rule
+
+        # if there is another rule of lesser priority in the scenario than the rule, then the scenario is not selectable
+        #if any(other_rule in trade_off_prios for other_rule in [grounded_rule[0] for grounded_rule in scenario]):
+        #    return rule
+
         for next_rule in trade_off_prios:
-            if self.trade_off_priorities(next_rule, scenario):
-                return True
+            lesser_prio_goal =  self.trade_off_priorities(next_rule, scenario)
+            if lesser_prio_goal:
+                return lesser_prio_goal
 
         return False
     
