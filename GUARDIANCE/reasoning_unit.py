@@ -80,7 +80,7 @@ class ReasoningUnit():
         moral_obligations = []
 
         # returns all groundings of all triggered rules (all rules in the reason whose antecedence holds true together with all their truthmakers)
-        groundings  = self.groundings(self.reason_theory, extracted_data)
+        groundings  = self.groundings(extracted_data)
 
         #check if chosen scenario (course of action followed so far) is still a proper scenario and follow it further if it is
         if self.chosen_scenario in groundings and self.compute_binding(self.chosen_scenario, groundings, extracted_data):
@@ -140,10 +140,10 @@ class ReasoningUnit():
     Returns rules whose antecedences hold true  given the background information and the conclusions of rules in the reason theory.
     The truthness of the propositions is determined based on information that is extracted in the data_processor.
     """
-    def groundings(self, reason_theory, extracted_data):
+    def groundings(self, extracted_data):
         groundings= set()
         if extracted_data:
-            for rule in reason_theory.edges():
+            for rule in self.reason_theory.edges():
                 for grounding in self.data_processor.groundings_for_rule(extracted_data, rule):
                     groundings.add(grounding)
         return groundings

@@ -8,8 +8,10 @@ class Guard(ABC):
     def ensure_conformity(self, action, guiding_rules, observation):
         MATs = [(rule[0][1],rule[1]) for rule in guiding_rules]
         for MAT in MATs:
+            violated_obligation = self.mat_mapping.obligation_violated(action, MAT, observation) #TODO: ensure that function returns the obligation
             if self.mat_mapping.obligation_violated(action, MAT, observation):  
-                self.inform_human(action, MAT)
+                self.inform_human(action, MAT) #TODO: that something was wrong
+                self.retrigger(action, violated_obligation)
                 #first try to retrigger the DMM
                 #LLM needs a memory before this works
                     #action = self.retrigger(action, guiding_rules, observation, DMM_observation)
@@ -24,11 +26,4 @@ class Guard(ABC):
     """
     @abstractmethod
     def inform_human(self, action, violated_obligation):
-        pass
-
-    """
-    inform the DMM about the noncomformity of its action with a guiding rule and request another action
-    """
-    @abstractmethod
-    def retrigger(self, action, violated_obligation):
         pass

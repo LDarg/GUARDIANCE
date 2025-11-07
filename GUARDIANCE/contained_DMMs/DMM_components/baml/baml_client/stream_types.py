@@ -23,8 +23,14 @@ class StreamState(BaseModel, typing.Generic[StreamStateValueT]):
     value: StreamStateValueT
     state: typing_extensions.Literal["Pending", "Incomplete", "Complete"]
 # #########################################################################
-# Generated classes (10)
+# Generated classes (14)
 # #########################################################################
+
+class Action(BaseModel):
+    type: typing.Optional[typing.Union[str, str, str, str]] = None
+    identifier: typing.Optional[str] = None
+    help: typing.Optional[str] = None
+    direction: typing.Optional[str] = None
 
 class Child_Condition_PG(BaseModel):
     child_id: typing.Optional[str] = None
@@ -43,6 +49,11 @@ class Coordinate(BaseModel):
     x: typing.Optional[int] = None
     y: typing.Optional[int] = None
 
+class Feedback(BaseModel):
+    state: typing.Optional["RelevantStateElements"] = None
+    violated_obligation: typing.Optional["MAT"] = None
+    action: typing.Optional["Action"] = None
+
 class Happening(BaseModel):
     zone_id: typing.Optional[str] = None
     reason: typing.Optional[str] = None
@@ -54,11 +65,15 @@ class Happening_PT(BaseModel):
     required_MAT: typing.Optional[str] = None
     zone_name: typing.Optional[str] = None
 
+class MAT(BaseModel):
+    id: typing.Optional[str] = None
+    required_MAT: typing.Optional[str] = None
+
 class Obligation(BaseModel):
     obligation: typing.Optional[typing.Union["Happening", "Child_Condition_PT"]] = None
 
 class Output_PG(BaseModel):
-    type: typing.Optional[typing.Union[str, str, str]] = None
+    type: typing.Optional[typing.Union[str, str, str, str]] = None
     identifier: typing.Optional[str] = None
     help: typing.Optional[str] = None
     target_coordinate: typing.Optional[typing.List[int]] = None
@@ -69,6 +84,11 @@ class Output_PT(BaseModel):
     identifier: typing.Optional[str] = None
     help: typing.Optional[str] = None
     reasoning: typing.Optional[str] = None
+
+class RelevantStateElements(BaseModel):
+    agent_coordinate: typing.Optional["Coordinate"] = None
+    child_conditions: typing.Optional[typing.List["Child_Condition_PG"]] = None
+    happenings: typing.Optional[typing.List["Happening"]] = None
 
 class Zone(BaseModel):
     zone_id: typing.Optional[str] = None

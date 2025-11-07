@@ -36,18 +36,18 @@ class MAT_mapping_PG(MAT_Mapping):
             if any(np.array_equal(coord, np.array([0, 0])) for coord in zone["coordinates"]):
                 #check if the agent does not move out of it
                 if any(np.array_equal(observation["agent_coordinate"], coord) for coord in zone["coordinates"]) and action != ("move", 0):
-                    return True
+                    return MAT
                 #check if the agent wants to enter the zone
                 if observation["agent_coordinate"][0] == y_coordinate_boundary+1 and action == ("move", 2):
-                    return True
+                    return MAT
             # the agent is in the right zone
             else:
                 # check if the agent does not move out of it
                 if any(np.array_equal(observation["agent_coordinate"], coord) for coord in zone["coordinates"]) and action != ("move", 2):
-                    return True
+                    return MAT
                 # check if the agent wants to enter the zone
                 if observation["agent_coordinate"][0] == y_coordinate_boundary and action == ("move", 0):
-                    return True
+                    return MAT
                 
     """
     Idling ensures that the agent does not run against a child in a forbidden zone; no alternative strategies for normative goals provided.
@@ -66,13 +66,13 @@ class MAT_mapping_PG(MAT_Mapping):
         # both zones must not be entered; but the agent has to stay in one 
         if len(forbidden_zones) >= 2:
             return True
-        forbidden_zone_coord = [coord for zone in forbidden_zones for coord in zone["coordinates"]]
+        #forbidden_zone_coord = [coord for zone in forbidden_zones for coord in zone["coordinates"]]
         
-        for rule in set_of_rules:
-            #checks if child coordinates are in a (permanently forbidden) zone
-            if rule[0][1] != "Stay_out_of_the_zone":
-                child_coordinate = extracted_data["children"][rule[1]]["coordinate"]
-                if any(np.array_equal(child_coordinate, coord) for coord in forbidden_zone_coord):
-                    return True
+        #for rule in set_of_rules:
+         #   #checks if child coordinates are in a (permanently forbidden) zone
+         #   if rule[0][1] != "Stay_out_of_the_zone":
+         #       child_coordinate = extracted_data["children"][rule[1]]["coordinate"]
+         #       if any(np.array_equal(child_coordinate, coord) for coord in forbidden_zone_coord):
+         #           return True
 
         return False

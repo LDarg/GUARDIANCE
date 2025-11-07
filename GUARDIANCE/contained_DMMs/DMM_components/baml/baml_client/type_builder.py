@@ -20,7 +20,7 @@ from .globals import DO_NOT_USE_DIRECTLY_UNLESS_YOU_KNOW_WHAT_YOURE_DOING_RUNTIM
 class TypeBuilder(type_builder.TypeBuilder):
     def __init__(self):
         super().__init__(classes=set(
-          ["Child_Condition_PG","Child_Condition_PT","Coordinate","Happening","Happening_PT","Obligation","Output_PG","Output_PT","Zone","Zone_PG",]
+          ["Action","Child_Condition_PG","Child_Condition_PT","Coordinate","Feedback","Happening","Happening_PT","MAT","Obligation","Output_PG","Output_PT","RelevantStateElements","Zone","Zone_PG",]
         ), enums=set(
           []
         ), runtime=DO_NOT_USE_DIRECTLY_UNLESS_YOU_KNOW_WHAT_YOURE_DOING_RUNTIME)
@@ -31,8 +31,12 @@ class TypeBuilder(type_builder.TypeBuilder):
 
 
     # #########################################################################
-    # Generated classes 10
+    # Generated classes 14
     # #########################################################################
+
+    @property
+    def Action(self) -> "ActionViewer":
+        return ActionViewer(self)
 
     @property
     def Child_Condition_PG(self) -> "Child_Condition_PGViewer":
@@ -47,12 +51,20 @@ class TypeBuilder(type_builder.TypeBuilder):
         return CoordinateViewer(self)
 
     @property
+    def Feedback(self) -> "FeedbackViewer":
+        return FeedbackViewer(self)
+
+    @property
     def Happening(self) -> "HappeningViewer":
         return HappeningViewer(self)
 
     @property
     def Happening_PT(self) -> "Happening_PTViewer":
         return Happening_PTViewer(self)
+
+    @property
+    def MAT(self) -> "MATViewer":
+        return MATViewer(self)
 
     @property
     def Obligation(self) -> "ObligationViewer":
@@ -65,6 +77,10 @@ class TypeBuilder(type_builder.TypeBuilder):
     @property
     def Output_PT(self) -> "Output_PTViewer":
         return Output_PTViewer(self)
+
+    @property
+    def RelevantStateElements(self) -> "RelevantStateElementsViewer":
+        return RelevantStateElementsViewer(self)
 
     @property
     def Zone(self) -> "ZoneViewer":
@@ -82,8 +98,59 @@ class TypeBuilder(type_builder.TypeBuilder):
 
 
 # #########################################################################
-# Generated classes 10
+# Generated classes 14
 # #########################################################################
+
+class ActionAst:
+    def __init__(self, tb: type_builder.TypeBuilder):
+        _tb = tb._tb # type: ignore (we know how to use this private attribute)
+        self._bldr = _tb.class_("Action")
+        self._properties: typing.Set[str] = set([  "type",  "identifier",  "help",  "direction",  ])
+        self._props = ActionProperties(self._bldr, self._properties)
+
+    def type(self) -> baml_py.FieldType:
+        return self._bldr.field()
+
+    @property
+    def props(self) -> "ActionProperties":
+        return self._props
+
+
+class ActionViewer(ActionAst):
+    def __init__(self, tb: type_builder.TypeBuilder):
+        super().__init__(tb)
+
+    
+    def list_properties(self) -> typing.List[typing.Tuple[str, type_builder.ClassPropertyViewer]]:
+        return [(name, type_builder.ClassPropertyViewer(self._bldr.property(name))) for name in self._properties]
+    
+
+
+class ActionProperties:
+    def __init__(self, bldr: baml_py.ClassBuilder, properties: typing.Set[str]):
+        self.__bldr = bldr
+        self.__properties = properties # type: ignore (we know how to use this private attribute) # noqa: F821
+
+    
+    
+    @property
+    def type(self) -> type_builder.ClassPropertyViewer:
+        return type_builder.ClassPropertyViewer(self.__bldr.property("type"))
+    
+    @property
+    def identifier(self) -> type_builder.ClassPropertyViewer:
+        return type_builder.ClassPropertyViewer(self.__bldr.property("identifier"))
+    
+    @property
+    def help(self) -> type_builder.ClassPropertyViewer:
+        return type_builder.ClassPropertyViewer(self.__bldr.property("help"))
+    
+    @property
+    def direction(self) -> type_builder.ClassPropertyViewer:
+        return type_builder.ClassPropertyViewer(self.__bldr.property("direction"))
+    
+    
+
 
 class Child_Condition_PGAst:
     def __init__(self, tb: type_builder.TypeBuilder):
@@ -234,6 +301,53 @@ class CoordinateProperties:
     
 
 
+class FeedbackAst:
+    def __init__(self, tb: type_builder.TypeBuilder):
+        _tb = tb._tb # type: ignore (we know how to use this private attribute)
+        self._bldr = _tb.class_("Feedback")
+        self._properties: typing.Set[str] = set([  "state",  "violated_obligation",  "action",  ])
+        self._props = FeedbackProperties(self._bldr, self._properties)
+
+    def type(self) -> baml_py.FieldType:
+        return self._bldr.field()
+
+    @property
+    def props(self) -> "FeedbackProperties":
+        return self._props
+
+
+class FeedbackViewer(FeedbackAst):
+    def __init__(self, tb: type_builder.TypeBuilder):
+        super().__init__(tb)
+
+    
+    def list_properties(self) -> typing.List[typing.Tuple[str, type_builder.ClassPropertyViewer]]:
+        return [(name, type_builder.ClassPropertyViewer(self._bldr.property(name))) for name in self._properties]
+    
+
+
+class FeedbackProperties:
+    def __init__(self, bldr: baml_py.ClassBuilder, properties: typing.Set[str]):
+        self.__bldr = bldr
+        self.__properties = properties # type: ignore (we know how to use this private attribute) # noqa: F821
+
+    
+    
+    @property
+    def state(self) -> type_builder.ClassPropertyViewer:
+        return type_builder.ClassPropertyViewer(self.__bldr.property("state"))
+    
+    @property
+    def violated_obligation(self) -> type_builder.ClassPropertyViewer:
+        return type_builder.ClassPropertyViewer(self.__bldr.property("violated_obligation"))
+    
+    @property
+    def action(self) -> type_builder.ClassPropertyViewer:
+        return type_builder.ClassPropertyViewer(self.__bldr.property("action"))
+    
+    
+
+
 class HappeningAst:
     def __init__(self, tb: type_builder.TypeBuilder):
         _tb = tb._tb # type: ignore (we know how to use this private attribute)
@@ -328,6 +442,49 @@ class Happening_PTProperties:
     @property
     def zone_name(self) -> type_builder.ClassPropertyViewer:
         return type_builder.ClassPropertyViewer(self.__bldr.property("zone_name"))
+    
+    
+
+
+class MATAst:
+    def __init__(self, tb: type_builder.TypeBuilder):
+        _tb = tb._tb # type: ignore (we know how to use this private attribute)
+        self._bldr = _tb.class_("MAT")
+        self._properties: typing.Set[str] = set([  "id",  "required_MAT",  ])
+        self._props = MATProperties(self._bldr, self._properties)
+
+    def type(self) -> baml_py.FieldType:
+        return self._bldr.field()
+
+    @property
+    def props(self) -> "MATProperties":
+        return self._props
+
+
+class MATViewer(MATAst):
+    def __init__(self, tb: type_builder.TypeBuilder):
+        super().__init__(tb)
+
+    
+    def list_properties(self) -> typing.List[typing.Tuple[str, type_builder.ClassPropertyViewer]]:
+        return [(name, type_builder.ClassPropertyViewer(self._bldr.property(name))) for name in self._properties]
+    
+
+
+class MATProperties:
+    def __init__(self, bldr: baml_py.ClassBuilder, properties: typing.Set[str]):
+        self.__bldr = bldr
+        self.__properties = properties # type: ignore (we know how to use this private attribute) # noqa: F821
+
+    
+    
+    @property
+    def id(self) -> type_builder.ClassPropertyViewer:
+        return type_builder.ClassPropertyViewer(self.__bldr.property("id"))
+    
+    @property
+    def required_MAT(self) -> type_builder.ClassPropertyViewer:
+        return type_builder.ClassPropertyViewer(self.__bldr.property("required_MAT"))
     
     
 
@@ -473,6 +630,53 @@ class Output_PTProperties:
     @property
     def reasoning(self) -> type_builder.ClassPropertyViewer:
         return type_builder.ClassPropertyViewer(self.__bldr.property("reasoning"))
+    
+    
+
+
+class RelevantStateElementsAst:
+    def __init__(self, tb: type_builder.TypeBuilder):
+        _tb = tb._tb # type: ignore (we know how to use this private attribute)
+        self._bldr = _tb.class_("RelevantStateElements")
+        self._properties: typing.Set[str] = set([  "agent_coordinate",  "child_conditions",  "happenings",  ])
+        self._props = RelevantStateElementsProperties(self._bldr, self._properties)
+
+    def type(self) -> baml_py.FieldType:
+        return self._bldr.field()
+
+    @property
+    def props(self) -> "RelevantStateElementsProperties":
+        return self._props
+
+
+class RelevantStateElementsViewer(RelevantStateElementsAst):
+    def __init__(self, tb: type_builder.TypeBuilder):
+        super().__init__(tb)
+
+    
+    def list_properties(self) -> typing.List[typing.Tuple[str, type_builder.ClassPropertyViewer]]:
+        return [(name, type_builder.ClassPropertyViewer(self._bldr.property(name))) for name in self._properties]
+    
+
+
+class RelevantStateElementsProperties:
+    def __init__(self, bldr: baml_py.ClassBuilder, properties: typing.Set[str]):
+        self.__bldr = bldr
+        self.__properties = properties # type: ignore (we know how to use this private attribute) # noqa: F821
+
+    
+    
+    @property
+    def agent_coordinate(self) -> type_builder.ClassPropertyViewer:
+        return type_builder.ClassPropertyViewer(self.__bldr.property("agent_coordinate"))
+    
+    @property
+    def child_conditions(self) -> type_builder.ClassPropertyViewer:
+        return type_builder.ClassPropertyViewer(self.__bldr.property("child_conditions"))
+    
+    @property
+    def happenings(self) -> type_builder.ClassPropertyViewer:
+        return type_builder.ClassPropertyViewer(self.__bldr.property("happenings"))
     
     
 

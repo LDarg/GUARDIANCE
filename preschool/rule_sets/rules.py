@@ -25,7 +25,7 @@ def set_rules(agent):
                                                     prio_trade_off=(('A child is crying and needs comfort'.replace(" ", "_"), 'Comfort the child'.replace(" ", "_")),),
                                                     name=f"δ{get_edge_number_as_index(agent)}")
     agent.reasoning_unit.reason_theory.add_edge('A child has scratched its knee and needs band-aids'.replace(" ", "_"), 'Doctor the child'.replace(" ", "_"), 
-                                                    lower_order=set(), 
+                                                    lower_order=(('Children have finished their work early and are now running around wildly'.replace(" ", "_"), 'Stay out of the zone'.replace(" ", "_"),)), 
                                                     prio_trade_off=(('A child has fallen down and needs help to get up'.replace(" ", "_"), 'Help the child stand up'.replace(" ", "_")),),
                                                     name=f"δ{get_edge_number_as_index(agent)}")
     agent.reasoning_unit.reason_theory.add_edge('Children have finished their work early and are now running around wildly'.replace(" ", "_"), 'Stay out of the zone'.replace(" ", "_"), 

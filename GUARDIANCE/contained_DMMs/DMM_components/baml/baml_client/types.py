@@ -41,8 +41,14 @@ def all_succeeded(checks: typing.Dict[CheckName, Check]) -> bool:
 # #########################################################################
 
 # #########################################################################
-# Generated classes (10)
+# Generated classes (14)
 # #########################################################################
+
+class Action(BaseModel):
+    type: typing.Union[typing_extensions.Literal['move'], typing_extensions.Literal['prepare'], typing_extensions.Literal['help'], typing_extensions.Literal['idle']]
+    identifier: typing.Optional[str] = None
+    help: typing.Optional[str] = None
+    direction: typing.Optional[str] = None
 
 class Child_Condition_PG(BaseModel):
     child_id: str
@@ -61,6 +67,11 @@ class Coordinate(BaseModel):
     x: int
     y: int
 
+class Feedback(BaseModel):
+    state: "RelevantStateElements"
+    violated_obligation: "MAT"
+    action: "Action"
+
 class Happening(BaseModel):
     zone_id: str
     reason: str
@@ -72,11 +83,15 @@ class Happening_PT(BaseModel):
     required_MAT: str
     zone_name: str
 
+class MAT(BaseModel):
+    id: str
+    required_MAT: str
+
 class Obligation(BaseModel):
     obligation: typing.Union["Happening", "Child_Condition_PT"]
 
 class Output_PG(BaseModel):
-    type: typing.Union[typing_extensions.Literal['move'], typing_extensions.Literal['prepare'], typing_extensions.Literal['help']]
+    type: typing.Union[typing_extensions.Literal['move'], typing_extensions.Literal['prepare'], typing_extensions.Literal['help'], typing_extensions.Literal['idle']]
     identifier: typing.Optional[str] = None
     help: typing.Optional[str] = None
     target_coordinate: typing.Optional[typing.List[int]] = None
@@ -87,6 +102,11 @@ class Output_PT(BaseModel):
     identifier: typing.Optional[str] = None
     help: typing.Optional[str] = None
     reasoning: str
+
+class RelevantStateElements(BaseModel):
+    agent_coordinate: "Coordinate"
+    child_conditions: typing.Optional[typing.List["Child_Condition_PG"]] = None
+    happenings: typing.Optional[typing.List["Happening"]] = None
 
 class Zone(BaseModel):
     zone_id: str

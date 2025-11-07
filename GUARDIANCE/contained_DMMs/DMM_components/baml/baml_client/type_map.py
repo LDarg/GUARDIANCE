@@ -16,6 +16,9 @@ from . import stream_types
 
 type_map = {
 
+    "types.Action": types.Action,
+    "stream_types.Action": stream_types.Action,
+
     "types.Child_Condition_PG": types.Child_Condition_PG,
     "stream_types.Child_Condition_PG": stream_types.Child_Condition_PG,
 
@@ -25,11 +28,17 @@ type_map = {
     "types.Coordinate": types.Coordinate,
     "stream_types.Coordinate": stream_types.Coordinate,
 
+    "types.Feedback": types.Feedback,
+    "stream_types.Feedback": stream_types.Feedback,
+
     "types.Happening": types.Happening,
     "stream_types.Happening": stream_types.Happening,
 
     "types.Happening_PT": types.Happening_PT,
     "stream_types.Happening_PT": stream_types.Happening_PT,
+
+    "types.MAT": types.MAT,
+    "stream_types.MAT": stream_types.MAT,
 
     "types.Obligation": types.Obligation,
     "stream_types.Obligation": stream_types.Obligation,
@@ -39,6 +48,9 @@ type_map = {
 
     "types.Output_PT": types.Output_PT,
     "stream_types.Output_PT": stream_types.Output_PT,
+
+    "types.RelevantStateElements": types.RelevantStateElements,
+    "stream_types.RelevantStateElements": stream_types.RelevantStateElements,
 
     "types.Zone": types.Zone,
     "stream_types.Zone": stream_types.Zone,
