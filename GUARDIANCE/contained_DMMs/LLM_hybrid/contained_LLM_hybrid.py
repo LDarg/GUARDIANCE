@@ -164,6 +164,3 @@ class contained_LLM_PG():
             self.course_correction = True
 
         return action
-
-                #DMM_input["feedback"] = "" 
-                #self.retrigger(action, violated_obligation, DMM_input)
