@@ -66,13 +66,5 @@ class MAT_mapping_PG(MAT_Mapping):
         # both zones must not be entered; but the agent has to stay in one 
         if len(forbidden_zones) >= 2:
             return True
-        #forbidden_zone_coord = [coord for zone in forbidden_zones for coord in zone["coordinates"]]
-        
-        #for rule in set_of_rules:
-         #   #checks if child coordinates are in a (permanently forbidden) zone
-         #   if rule[0][1] != "Stay_out_of_the_zone":
-         #       child_coordinate = extracted_data["children"][rule[1]]["coordinate"]
-         #       if any(np.array_equal(child_coordinate, coord) for coord in forbidden_zone_coord):
-         #           return True
 
         return False
