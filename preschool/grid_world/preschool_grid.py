@@ -190,8 +190,7 @@ class Preschool_Grid(gym.Env):
 
     """
     functions for returning information about the state 
-
-    return of the observation function: the flattened and concatenated agent and goal position observations (np.array)
+    
     """
     def observation(self):
         return np.array([self.agent_coordinates[0], self.agent_coordinates[1]])
@@ -238,9 +237,6 @@ class Preschool_Grid(gym.Env):
             random_gen.integers(0, self.map.height),
         ])
 
-    """
-    functions for resetting the environment
-    """
     def reset(self, seed=None, options=None):
         self.agent_coordinates = np.array([0,0])
         self.np_random, seed = gym.utils.seeding.np_random(seed)
@@ -259,8 +255,6 @@ class Preschool_Grid(gym.Env):
             
     """
     update the environment according to what the agent does and subsequently update the environment according to how the persons move
-    returns the reward according to the selected reward type (instrumental, rescuing, waiting or MO)
-    also returns the output of a cost functions indicating if the agent pushed a person off the bridge
     """
     def step(self, action):
         reward = 0
@@ -293,10 +287,10 @@ class Preschool_Grid(gym.Env):
                         self.map.children.remove(child)
                         break
 
-        # generate moral goals and happenings with a certain probability
-        if random.random() < 1: #0.15
+        # generate normatively required goals and happenings with a certain probability
+        if random.random() < 0.15: #0.15
             self.map.generate_moral_goal()
-        if random.random() < 1: #0.1
+        if random.random() < 0.1: #0.1
             self.map.generate_happening()
 
         observation = self.observation()

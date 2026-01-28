@@ -10,7 +10,7 @@ class MAT_Mapping(ABC):
          Args:
             action: The primitive action selected by the DMM for execution.
             MAT : The MAT (macro-action-type) the action needs to be conform with.
-            observation: The current state of the environment as perceived by the agent extended with  by the MM. 
+            observation: The current state of the environment as perceived by the agent extended with the MM. 
 
          Returns:
             bool: True if action conforms with the MAT in the state, False otherwise.
@@ -36,7 +36,16 @@ class MAT_Mapping(ABC):
          pass
          """
          execute a default action if the DMM fails to decide on an action that is conform with the guiding rules
-         if it is not possible to simply calculate a default action that is conform with moral goals, the overall agent could be simply instructed to do nothing (or move out of the way if it is a physical system or call for human advisory etc.) to prevent causing harm
+         for example, the overall agent could be instructed to do nothing to prevent causing harm (or move out of the way if it steers a physical system or call for human advisory etc.) 
+
+         Args:
+            MATs: Macro-action-types that are overall binding. 
+            observation: The information relevant for deciding whether the set of rules is conflicting; extracted by interpretation from the raw observation data by the data processor.
+
+         Returns:
+            bool: True if the conclusions in the set of rules are conflicted, False otherwise.
          """
+
+      
 
 

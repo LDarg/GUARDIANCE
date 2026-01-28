@@ -59,20 +59,20 @@ class Data_Processor_PG(Data_Processor):
     """
     all data is passed to the DMM; no filtering is applied.
     """
-    def DMM_observation(self, data, guiding_rules):
+    def DMM_observation(self, extracted_data, guiding_rules):
         
-        child_conditions = [{"child_id": str(data["children"][rule[1]]["child_id"]),
+        child_conditions = [{"child_id": str(extracted_data["children"][rule[1]]["child_id"]),
                              "reason": rule[0][0],
                              "required_MAT": rule[0][1],
-                             "coordinate": {"x": data["children"][rule[1]]["coordinate"][0], "y": data["children"][rule[1]]["coordinate"][1]}
+                             "coordinate": {"x": extracted_data["children"][rule[1]]["coordinate"][0], "y": extracted_data["children"][rule[1]]["coordinate"][1]}
                              }
-                            for rule in guiding_rules if rule[0][0] in [child["description"] for child in data["children"].values()]]
+                            for rule in guiding_rules if rule[0][0] in [child["description"] for child in extracted_data["children"].values()]]
         
-        happenings = [{"zone_id": str(data["zones"][rule[1]]["zone_id"]),
+        happenings = [{"zone_id": str(extracted_data["zones"][rule[1]]["zone_id"]),
                   "reason": rule[0][0],
                   "required_MAT": rule[0][1]}
-                  for rule in guiding_rules if rule[0][0] in [happening["description"] for happening in data["happenings"].values()]]
-                   #for rule in guiding_rules if rule[0][0] in [zone["description"] for zone in data["zones"].values()]]
+                  for rule in guiding_rules if rule[0][0] in [happening["description"] for happening in extracted_data["happenings"].values()]]
+                   #for rule in guiding_rules if rule[0][0] in [zone["description"] for zone in extracted_data["zones"].values()]]
 
         normative_reasons= {"child_conditions": child_conditions, "happenings": happenings}
         DMM_input = normative_reasons
@@ -84,44 +84,41 @@ class Data_Processor_PG(Data_Processor):
                     {"x": coord[0], "y": coord[1]} for coord in zone["coordinates"] 
                 ],
             }
-            for zone in data["zones"].values()
+            for zone in extracted_data["zones"].values()
         ]
-        DMM_input["station_coordinates"] = [{"x": coordinate[0], "y": coordinate[1]} for coordinate in data["station_coordinates"]]
-        DMM_input["agent_coordinate"] = {"x": int(data["agent_coordinate"][0]), "y": int(data["agent_coordinate"][1])}
-        DMM_input["reasons_changed"] = data.get("reasons_changed", False)
+        DMM_input["station_coordinates"] = [{"x": coordinate[0], "y": coordinate[1]} for coordinate in extracted_data["station_coordinates"]]
+        DMM_input["agent_coordinate"] = {"x": int(extracted_data["agent_coordinate"][0]), "y": int(extracted_data["agent_coordinate"][1])}
+        DMM_input["reasons_changed"] = extracted_data.get("reasons_changed", False)
         
         return DMM_input
     
     """
-    GENERAL: data relevant for selecting a default action is selected and transformed such that it can be processed by the guard
-    only instrumentally relvant data can be filtered out while normatively relevant data that was hidden from the DMM (like the existence of a zone) could be taken in 
-
-    PRESCHOOL: similar to the input of the DMM; station zones are filtered out, because they are only relevant for the deployment prupose, not for behaving compliant with normative requirements
+    similar to the input of the DMM; station zones are filtered out, because they are only relevant for the deployment prupose, not for behaving compliant with normative requirements
     """
 
-    def guard_observation(self, data, guiding_rules):
-        data = copy.deepcopy(self.extracted_information)
+    def guard_observation(self, extracted_data, guiding_rules):
+        extracted_data = copy.deepcopy(self.extracted_information)
 
-        child_conditions = [{"child_id": data["children"][rule[1]]["child_id"],
+        child_conditions = [{"child_id": extracted_data["children"][rule[1]]["child_id"],
                              "reason": rule[0][0],
                              "required_MAT": rule[0][1],
-                             "coordinate": [data["children"][rule[1]]["coordinate"][0], data["children"][rule[1]]["coordinate"][1]]
+                             "coordinate": [extracted_data["children"][rule[1]]["coordinate"][0], extracted_data["children"][rule[1]]["coordinate"][1]]
                              }
-                            for rule in guiding_rules if rule[0][0] in [child["description"] for child in data["children"].values()]]
+                            for rule in guiding_rules if rule[0][0] in [child["description"] for child in extracted_data["children"].values()]]
         
-        happenings = [{"zone_id": data["zones"][rule[1]]["zone_id"],
+        happenings = [{"zone_id": extracted_data["zones"][rule[1]]["zone_id"],
                   "reason": rule[0][0],
                   "required_MAT": rule[0][1]}
-                  for rule in guiding_rules if rule[0][0] in [happening["description"] for happening in data["happenings"].values()]]
+                  for rule in guiding_rules if rule[0][0] in [happening["description"] for happening in extracted_data["happenings"].values()]]
         
         guard_observation = {"child_conditions": child_conditions, "happenings": happenings}
-        guard_observation["agent_coordinate"] = data["agent_coordinate"]
+        guard_observation["agent_coordinate"] = extracted_data["agent_coordinate"]
         guard_observation["zones"] = [
             {
                 "zone_id": zone["zone_id"],
                 "coordinates": zone["coordinates"] 
             }
-            for zone in data["zones"].values()
+            for zone in extracted_data["zones"].values()
         ]
 
         return guard_observation
