@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 class Data_Processor(ABC):
     @abstractmethod
-    def extract_relevant_information(self, reason_theory, observation):
+    def extract_relevant_information(self, reason_theory, observation, static_env_info=None):
         pass
     """
     Collect/retrieve/extract data received from the environment that is normatively relevant as well as information that is instrumentally relevant.

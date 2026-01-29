@@ -3,14 +3,24 @@ from GUARDIANCE.interfaces.guard import Guard
 import logging
 
 class Guard_PT(Guard):
-    def __init__(self, DMM, mat_mapping:MAT_Mapping):
-        self.DMM = DMM
+    def __init__(self, mat_mapping:MAT_Mapping):
         self.mat_mapping = mat_mapping
+
+    """
+    monitor and ensure that the actions proposed by the DMM conform to the guiding rules
+    """
+    def ensure_conformity(self, action, guiding_rules, observation):
+        MATs = [(rule[0][1],rule[1]) for rule in guiding_rules]
+        for MAT in MATs:
+            violated_obligation = self.mat_mapping.obligation_violated(action, MAT, observation)
+            if self.mat_mapping.obligation_violated(action, MAT, observation):  
+                self.inform_human(action, MAT)
+                self.retrigger(action, violated_obligation)
+                action = self.mat_mapping.default_action( MATs, observation)
+                return action
+
+        return action
     
     def inform_human(self, action, violated_obligation):
         logging.warning(f"The action {action} violates the obligation {violated_obligation}")
         pass
-
-    def retrigger(self, action, violated_obligation):
-        pass
-        #self.DMM.Rethink_Choice_Of_Action(action=action, obligation=violated_obligation)

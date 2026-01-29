@@ -1,4 +1,5 @@
 from GUARDIANCE.contained_DMMs.LLM_hybrid.contained_LLM_hybrid import contained_LLM_PG
+from GUARDIANCE.contained_DMMs.LLM_hybrid.impl_interfaces.agent_container_PG import Agent_Container_PG
 from preschool.grid_world.preschool_grid import Preschool_Grid
 import gymnasium as gym
 from preschool.rule_sets.rules import set_rules
@@ -23,13 +24,15 @@ def navigate(env, agent):
         terminated = False
         truncated = False
         env.render()
+        observation = (rl_obs, info)
 
         while not terminated and not truncated:
-            action = agent.take_action(rl_obs, info)
+            action = agent.take_action(observation)
             rl_obs, _, terminated, truncated, info = env.step(action)
+            observation = (rl_obs, info)
 
 # set up environment and agent
-agent = contained_LLM_PG()
+agent = Agent_Container_PG()
 env_id = 'Preschool-v0'
 if env_id not in gym.envs.registry:
     gym.register(

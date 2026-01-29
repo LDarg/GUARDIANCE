@@ -36,7 +36,7 @@ class contained_LLM_PG():
         self.mat_mapping = MAT_mapping_PG(self.config)
         self.data_processor = Data_Processor_PG()
         self.reasoning_unit = ReasoningUnit(self.mat_mapping, self.data_processor)
-        self.guard = Guard_PG(self.DMM, self.mat_mapping)
+        self.guard = Guard_PG(self.mat_mapping)
         self.static_env_info = None
         self.target_coordinate = None
         self.guiding_rules = None

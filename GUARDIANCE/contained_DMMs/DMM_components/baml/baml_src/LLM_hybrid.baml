@@ -108,7 +108,7 @@ function Take_Action_PG(agent_coordinate: Coordinate, station_coordinates: Coord
       Your goal is to prepare all learning stations as fast as possible.
       But you should prioritize fulfilling additional obligations.
       There are two types of obligations: helping children and keeping constraints that may arise from happenings in zones.
-      In order to help a child you must be at the exact same coordinates as the child. Otherwise, in order to help the child, you first have to move to the exact same coordinates. It is not enough to be positioned nearby the child. 
+      In order to help a child you must first move to the exact same coordinates as the child. It is not enough to be positioned nearby the child. 
       Happenings in zones may require you to not move to a specific zone (or to exit the zone if you are already in the zone). If you are in a zone, you must stay out of, you have to move to the nearest coordinate outside the zone along the shortest possible path. 
       These are the zones defined through their coordinates:
       {% for zone in zones %}
@@ -143,7 +143,7 @@ function Take_Action_PG(agent_coordinate: Coordinate, station_coordinates: Coord
       REMEMBER: If you are in a zone, you must stay out of, you have to move to the nearest coordinate outside the zone along the shortest possible path. 
       Double check that the action you want to take next is compliant with all obligations by taking this feedback into account. 
       {% endif %}
-      Choose you next action and explicitly state you reasoning behind your decision. Go through the list of coordinates to double check if your assumption about which coordinate belongs to which zone is correct.
+      Choose you next action and explicitly state your reasoning behind your decision. Make sure that if you aim at helping a child, you are at the same coordinates as the child. Go through the list of coordinates to double check if your assumption about which coordinate belongs to which zone is correct.
 
     {{ ctx.output_format }}«
     "#

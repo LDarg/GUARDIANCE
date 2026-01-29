@@ -3,29 +3,18 @@ from GUARDIANCE.interfaces.MAT_mapping import MAT_Mapping
 import uuid
 import numpy as np
 
+# Configuration for the preschool environment including inforamtion about which MAT is required for helping children 
 config = Config()
 
 """
 An MAT_mapping for the text-version of the preschool setting navigated by an LLM agent.
 """
 class MAT_mapping_PG(MAT_Mapping):
-    def __init__(self, config):
-        # config is needed for retrieving the infomration which action is required for which child condition 
+    def __init__(self):
         self.config = config
 
-    # self.action_to_direction = {
-    #        0: self.directions[0], #right
-    #        1: self.directions[1], #down
-    #        2: self.directions[2], #left
-    #        3: self.directions[3], #up
-    #    }
-    
-    def manhattan_distance(array1, array2):
-        return np.sum(np.abs(array1 - array2))
-
     """
-    checks if the agent exits the zone if currently inside and does not enter the zone if currently outside
-    all trajectories are compliant with each normative goal as none of them has a time constraint
+    Checks if the agent exits the zone if currently inside and does not enter the zone if currently outside.
     """
     def obligation_violated(self, action, MAT, observation):
 
@@ -50,7 +39,7 @@ class MAT_mapping_PG(MAT_Mapping):
                     return MAT
                 
     """
-    Idling ensures that the agent does not run against a child in a forbidden zone; no alternative strategies for normative goals provided.
+    Idling ensures that the agent does not run against a child in a forbidden zone; the guard does not implement alternative strategies for normative goals.
     """
     def default_action(self, MATs, observation):
         return ('idle',)
