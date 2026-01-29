@@ -38,44 +38,47 @@ class Agent_Container_PG(Agent_Container):
         self.normative_reasons = None
         self.guiding_rules = set()
 
-
     def take_action(self, observation):
         rl_obs, observation = observation
-        
-        extracted_data = self.data_processor.extract_relevant_information(self.reasoning_unit.reason_theory, observation, self.static_env_info)
+
+        extracted_data = self.data_processor.extract_relevant_information(
+            self.reasoning_unit.reason_theory,
+            observation,
+            self.static_env_info,
+        )
+
         if self.guiding_rules is None:
             self.guiding_rules = self.reasoning_unit.moral_obligations(extracted_data)
-        #check if normative reasons have changed
-        if not extracted_data["children"] | extracted_data["happenings"] == self.normative_reasons:
-            self.normative_reasons = extracted_data["children"] | extracted_data["happenings"]
+
+        current_reasons = extracted_data["children"] | extracted_data["happenings"]
+        reasons_changed = current_reasons != self.normative_reasons
+
+        if reasons_changed:
+            self.normative_reasons = current_reasons
             new_guiding_rules = self.reasoning_unit.moral_obligations(extracted_data)
-            # check if the change in normative reasons enforced an adaptation of the guiding rules
+
+            # Check whether the situation changed such that new rules are guiding for conforming with normative requirements
             if new_guiding_rules != self.guiding_rules:
                 self.guiding_rules = new_guiding_rules
-                DMM_observation = self.data_processor.DMM_observation(extracted_data, self.guiding_rules)
-                DMM_input = {"reasons_changed": True,
-                            "rl_obs": rl_obs,
-                            "DMM_observation": DMM_observation,
-                            "guiding_rules": new_guiding_rules
-                                }
-                # let the DMM determine a new course of action that is conform with the change in guiding rules
-                action = self.DMM.take_action(DMM_input)
+                rules_changed = True
             else:
-                DMM_observation = self.data_processor.DMM_observation(extracted_data, self.guiding_rules)
-                DMM_input = {"reasons_changed": False,
-                            "rl_obs": rl_obs,
-                            "DMM_observation": DMM_observation,
-                            "guiding_rules": self.guiding_rules
-                            }
-                action = self.DMM.take_action(DMM_input)
+                rules_changed = False
         else:
-            DMM_observation = self.data_processor.DMM_observation(extracted_data, self.guiding_rules)
-            DMM_input = {"reasons_changed": False,
-                        "rl_obs": rl_obs,
-                        "DMM_observation": DMM_observation,
-                        "guiding_rules": self.guiding_rules
-                        }
-            action = self.DMM.take_action(DMM_input)
+            rules_changed = False
+
+        DMM_observation = self.data_processor.DMM_observation(
+            extracted_data,
+            self.guiding_rules,
+        )
+
+        DMM_input = {
+            "reasons_changed": rules_changed,
+            "rl_obs": rl_obs,
+            "DMM_observation": DMM_observation,
+            "guiding_rules": self.guiding_rules,
+        }
+
+        action = self.DMM.take_action(DMM_input)
 
         guard_observation = self.data_processor.guard_observation(extracted_data, self.guiding_rules)
         violated_obligation = self.guard.violated_obligation(action, self.guiding_rules, guard_observation)
