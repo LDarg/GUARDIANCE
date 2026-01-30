@@ -5,7 +5,5 @@ __pycache__/
 *.py[cod]
 .DS_Store
 *.egg
-.github
 *.log
 .github/
-.saved_plots/
