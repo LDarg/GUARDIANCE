@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
 import gymnasium as gym
-import argparse
-import ast
 from preschool.grid_world.preschool_grid import Preschool_Grid
-from preschool.grid_world.rand_target import Rand_Target, PrescCoordinates
 
 def demo(env):
     """
@@ -22,7 +19,7 @@ def demo(env):
             #env.render()
             # randomly choose an action
             action = env.action_space.sample()
-            state, reward, terminated, truncated, _ = env.step((action, "move"))
+            state, reward, terminated, truncated, _ = env.step(action)
             print(f"Action: {action}, Reward: {reward}, State: \n {state}")
 
 if __name__ == '__main__':
@@ -35,6 +32,4 @@ if __name__ == '__main__':
             max_episode_steps=100,
         )
     env = gym.make("Preschool-v0")
-    env = Rand_Target(env)
-    env = PrescCoordinates(env)
     demo(env)

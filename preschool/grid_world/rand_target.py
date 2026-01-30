@@ -4,7 +4,6 @@ from gymnasium import spaces
 import pygame
 from random import random
 
-
 class Rand_Target(gym.Wrapper):
         def __init__(self, env):
             super().__init__(env)
@@ -13,27 +12,17 @@ class Rand_Target(gym.Wrapper):
 
             self.target_position = np.array([0,0])
             len_obs_dict = len(self.get_obs_dict())
-            observation_size = len_obs_dict * self.env.total_grid_cells
             self.observation_space = spaces.Box(
                 low=0,
                 high=1,
-                shape=(observation_size,),
+                shape=(4,),
                 dtype=np.float32
             )
 
             self.max_steps = 30
 
         def observation(self):
-            obs_dict = self.get_obs_dict()
-
-            # Flatten 
-            agent_flat = obs_dict["agent_window"].flatten()
-            target_flat = obs_dict["target_window"].flatten()
-
-            # Concatenate into one 1D array
-            nn_input = np.concatenate([agent_flat, target_flat])
-
-            return np.array(nn_input.astype(np.float32))
+            return np.array([self.env.agent_coordinates[0], self.agent_coordinates[1], self.target_position[0], self.target_position[1]])
     
         def get_obs_dict(self):
 
@@ -105,84 +94,3 @@ class Rand_Target(gym.Wrapper):
             )
             return canvas
         
-
-class PrescCoordinates(gym.ObservationWrapper):
-    def __init__(self, env):
-            super().__init__(env)
-
-            self.observation_space = spaces.Box(
-                low=0,
-                high=1,
-                shape=(4,),
-                dtype=np.float32
-            )
-
-    def observation(self, observation):
-         return np.array([self.env.agent_coordinates[0], self.agent_coordinates[1], self.target_position[0], self.target_position[1]])
-
-    
-class PrescFlattened(gym.ObservationWrapper):
-    def __init__(self, env):
-            super().__init__(env)
-
-            self.observation_space = spaces.Box(
-                low=0,
-                high=1,
-                shape=(2,),
-                dtype=np.float32
-            )
-
-    def observation(self, observation):
-        agent_x, agent_y = self.env.agent_coordinates
-        goal_x, goal_y = self.env.target_position
-        agent_flat = agent_y * self.env.map.width + agent_x
-        goal_flat = goal_y * self.env.map.width + goal_x
-        obs = np.array([agent_flat, goal_flat])
-        return obs
-    
-
-def manhattan_distance(a, b):
-    return abs(a[0] - b[0]) + abs(a[1] - b[1])
-class Extended(gym.ObservationWrapper):
-    def __init__(self, env):
-            super().__init__(env)
-
-            self.observation_space = spaces.Box(
-                low=0,
-                high=1,
-                shape=(3,),
-                dtype=np.float32
-            )
-
-    def observation(self, observation):
-        agent_x, agent_y = self.env.agent_coordinates
-        goal_x, goal_y = self.env.target_position
-        agent_flat = agent_y * self.env.map.width + agent_x
-        goal_flat = goal_y * self.env.map.width + goal_x
-
-        dr = goal_y - agent_y
-
-        dc = goal_x - agent_x
-
-        compass_direction = -1
-        if dr < 0 and dc == 0:
-            compass_direction = 0  # North
-
-        elif dr < 0 and dc > 0:
-            compass_direction = 1  # Northeast
-
-        elif dr == 0 and dc > 0:
-            compass_direction = 2  # East
-
-        distance = manhattan_distance(self.env.agent_coordinates, self.env.target_position) / (2 * 16)
-
-        at_edge = (
-
-            agent_y == 0 or agent_y == self.env.map.width - 1 or
-
-            agent_x == 0 or agent_x == self.env.map.height - 1
-
-        )
-
-        obs = np.array([compass_direction, distance, at_edge])
-        return obs

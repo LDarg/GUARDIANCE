@@ -1,16 +1,24 @@
 from GUARDIANCE.interfaces.DMM import DMM
 import logging
-from GUARDIANCE.contained_DMMs.DMM_components.RL_agents.navigation_agent import setup_agent  
+from preschool.grid_world.rand_target import Rand_Target
 import torch
 import numpy as np
 import uuid
+from stable_baselines3 import PPO
+import gymnasium as gym
 
 # baml interface for API calls to LLMs (part of the agent that decides on the course of action)
 from GUARDIANCE.contained_DMMs.DMM_components.baml.baml_client import b
 
-# Reinforcement Learning agent (called by the LLM to navigate in the environment)
-rl_agent_name = "navigation_agent_700_episodes"
-rl_agent,_= setup_agent(rl_agent_name)
+env_id = 'Preschool-v0'
+if env_id not in gym.envs.registry:
+    gym.register(
+        id=env_id,
+        entry_point='preschool.grid_world.preschool_grid:Preschool_Grid',
+        max_episode_steps=100,
+    )
+env = gym.make(env_id)
+env = Rand_Target(env)
 
 action_to_direction = {
     0: "right",
@@ -24,7 +32,7 @@ logger = logging.getLogger(__name__)
 class LLM_hybrid(DMM):
     def __init__(self):
         self.LLM = b
-        self.rl_agent= rl_agent
+        self.rl_agent= PPO.load("navigation_agent", env=env)
         self.target_coordinate = None
 
         self.DMM_input = None
@@ -61,7 +69,9 @@ class LLM_hybrid(DMM):
         assert self.target_coordinate is not None, "Target position not set."
         rl_obs = self.set_target_rl(rl_obs)
         with torch.no_grad():
-            move_dir = self.rl_agent.policy_dqn(self.rl_agent.transformation(rl_obs)).argmax().item()
+            move_dir, _ = self.rl_agent.predict(rl_obs, deterministic=True)
+            move_dir = int(move_dir)
+           # move_dir = self.rl_agent.policy_dqn(self.rl_agent.transformation(rl_obs)).argmax().item()
         return ("move", move_dir)
     
     def update_LLM_input(self, DMM_observation, feedback=None):

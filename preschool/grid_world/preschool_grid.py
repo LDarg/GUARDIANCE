@@ -138,7 +138,6 @@ class Preschool_Grid(gym.Env):
         self.grid_height = self.map.height  
         len_obs_dict = len(self.get_obs_dict())
         self.total_grid_cells = self.map.width  * self.map.height
-       # observation_size = len_obs_dict * self.total_grid_cells
         self.observation_space = spaces.Box(
             low=0,
             high=1,
@@ -294,9 +293,9 @@ class Preschool_Grid(gym.Env):
                             break
 
         # Generate normatively required goals and happenings with a certain probability
-        if random.random() < 0.15: #0.15
+        if random.random() < 0.1: #0.15
             self.map.generate_moral_goal()
-        if random.random() < 0.1: #0.1
+        if random.random() < 0.05: #0.1
             self.map.generate_happening()
 
         observation = self.observation()
@@ -308,9 +307,8 @@ class Preschool_Grid(gym.Env):
     
     
     """
-    Functions for rendering the envrionment 
+    Functions for rendering the environment 
     """
-    
     def render(self):
         if self.render_mode == "human":
             canvas = self.render_frame()

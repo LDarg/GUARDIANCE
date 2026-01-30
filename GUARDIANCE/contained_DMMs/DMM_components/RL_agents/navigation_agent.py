@@ -8,7 +8,7 @@ import logging
 from torch import nn
 import os
 import gymnasium as gym
-from preschool.grid_world.rand_target import Rand_Target, Extended, PrescFlattened
+from preschool.grid_world.rand_target import Rand_Target
 import sys
 
 logger = logging.getLogger(__name__)
