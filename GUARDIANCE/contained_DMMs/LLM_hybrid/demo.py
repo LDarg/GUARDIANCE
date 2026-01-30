@@ -9,7 +9,6 @@ logging.basicConfig(filename='demo_LLM.log',
                     format='%(asctime)s %(levelname)s [%(filename)s:%(lineno)d] %(message)s',
                     level=logging.DEBUG)
 
-logging.info("Starting LLM_hybrid agent demo")
 
 def navigate(env, agent):
     env.set_render_mode("human")
@@ -42,7 +41,7 @@ env = gym.make("Preschool-v0")
 
 # Set initial rules for the agent
 set_rules(agent)
-agent.reasoning_unit.log_reason_theory(logger)
+agent.moral_module.reasoning_unit.log_reason_theory(logger)
 
 # Start navigation
 navigate(env, agent)

@@ -3,6 +3,7 @@ from GUARDIANCE.reasoning_unit import ReasoningUnit
 from GUARDIANCE.contained_DMMs.LLM_hybrid.impl_interfaces.MAT_mapping_PG import MAT_mapping_PG
 from GUARDIANCE.contained_DMMs.LLM_hybrid.impl_interfaces.data_processor_PG import Data_Processor_PG
 from GUARDIANCE.contained_DMMs.LLM_hybrid.impl_interfaces.guard_PG import Guard_PG
+from GUARDIANCE.contained_DMMs.LLM_hybrid.impl_interfaces.moral_module_PG import Moral_Module_PG
 import logging
 from GUARDIANCE.contained_DMMs.LLM_hybrid.impl_interfaces.LLM_hybrid import LLM_hybrid
 
@@ -14,9 +15,9 @@ class Agent_Container_PG(Agent_Container):
         self.mat_mapping = MAT_mapping_PG()
         self.data_processor = Data_Processor_PG()
         self.DMM = LLM_hybrid()
-        self.reasoning_unit = ReasoningUnit(self.mat_mapping, self.data_processor)
         self.guard = Guard_PG(self.mat_mapping)
-        
+        reasoning_unit = ReasoningUnit(self.mat_mapping, self.data_processor)
+        self.moral_module = Moral_Module_PG(reasoning_unit, self.data_processor)
 
         self.static_env_info = None
 
@@ -28,20 +29,20 @@ class Agent_Container_PG(Agent_Container):
         rl_obs, observation = observation
 
         extracted_data = self.data_processor.extract_relevant_information(
-            self.reasoning_unit.reason_theory,
+            self.moral_module.reasoning_unit.reason_theory,
             observation,
             self.static_env_info,
         )
 
         if self.guiding_rules is None:
-            self.guiding_rules = self.reasoning_unit.moral_obligations(extracted_data)
+            self.guiding_rules = self.moral_module.guiding_rules(extracted_data)
 
         current_reasons = extracted_data["children"] | extracted_data["happenings"]
         reasons_changed = current_reasons != self.normative_reasons
 
         if reasons_changed:
             self.normative_reasons = current_reasons
-            new_guiding_rules = self.reasoning_unit.moral_obligations(extracted_data)
+            new_guiding_rules = self.moral_module.guiding_rules(extracted_data)
 
             # Check whether the situation changed such that new rules are guiding for conforming with normative requirements
             if new_guiding_rules != self.guiding_rules:
