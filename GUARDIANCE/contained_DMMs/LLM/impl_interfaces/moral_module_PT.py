@@ -12,7 +12,7 @@ class Moral_Module_PT():
         self.extracted_data_cache = None
         self.guiding_rules_cache = None
 
-    def update_normatively_relevant_information(self, observation):
+    def update_relevant_information(self, observation):
         self.extracted_data_cache = self.data_processor.extract_relevant_information(self.reasoning_unit.reason_theory, observation)
 
     def update_guiding_rules(self):

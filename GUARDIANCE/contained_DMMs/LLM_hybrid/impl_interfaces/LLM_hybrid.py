@@ -41,7 +41,7 @@ class LLM_hybrid(DMM):
         
         DMM_observation = DMM_input["DMM_observation"]
         guiding_rules = DMM_input["guiding_rules"]
-        reasons_changed = DMM_input["reasons_changed"]
+        reasons_changed = DMM_input["rules_changed"]
         rl_obs = DMM_input["rl_obs"]
 
         self.update_LLM_input(DMM_observation)

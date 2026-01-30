@@ -1,6 +1,6 @@
 # A Framework for Guiding and Guarding AI Agents
 
-This repository contains a framework for an architecture that integrates a module for symbolic processing of guiding rules for an AI agentic system of which the conformance is enforced through a guard that monitors the agent's behavior and corrects them. The archticture is proposed in [Breaking Up with Normatively Monolithic Agency with GRACE: A Reason-Based Neuro-Symbolic Architecture for Safe and Ethical AI Alignment](https://arxiv.org/abs/2601.10520).
+This repository contains a framework for an architecture that integrates a module for symbolic processing of guiding rules for an AI agentic system of which the conformance is enforced through a guard that monitors the agent's behavior and corrects them. The architecture is introduced in [Breaking Up with Normatively Monolithic Agency with GRACE: A Reason-Based Neuro-Symbolic Architecture for Safe and Ethical AI Alignment](https://arxiv.org/abs/2601.10520).
 
 It further implements an environment simulating a preschool setting in which an AI steers a robot that is tasked with preparing learning stations while it further needs to conform to situationlly arising normative requirements. The environment is implemented as text-adventure and as grid-world.
 
@@ -44,10 +44,10 @@ It further implements an environment simulating a preschool setting in which an 
 2. **The Architecture**
 
    The repository contains interfaces for modules that are part of the GRACE-architecture:
-   - a **DMM**: which is the core decision-making unit (an AI agent),
-   - a **guard**: responsible for monitoring the agent’s behavior and applying corrective actions when necessary,
-   - an **agent_container**: which orchestrates the other modules, and
-   - a **moral_module**: which retrieves normative relevant information and determines guiding rules for the agent's behavior.
+   - a **DMM**, which is the core decision-making unit (an AI agent);
+   - a **guard** responsible for monitoring the agent’s behavior and applying corrective actions when necessary;
+   - an **agent_container**, which orchestrates the other modules; and
+   - a **moral_module**, which retrieves normative relevant information and determines guiding rules for the agent's behavior.
 
    In addition, the architecture includes a shared module that maps MATs to sets of allowed and disallowed primitive actions for the next step.
    Sharing this mapping across all submodules ensures a consistent understanding of which actions are permitted within the system.

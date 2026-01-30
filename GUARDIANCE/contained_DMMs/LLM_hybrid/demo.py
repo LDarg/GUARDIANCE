@@ -16,7 +16,7 @@ def navigate(env, agent):
 
     while True:
         rl_obs, info = env.reset()
-        agent.static_env_info = env.static_facts()
+        agent.update_static_env_info(env.static_facts())
 
         terminated = False
         truncated = False
@@ -29,7 +29,6 @@ def navigate(env, agent):
             observation = (rl_obs, info)
 
 # Set up environment and agent
-agent = Agent_Container_PG()
 env_id = 'Preschool-v0'
 if env_id not in gym.envs.registry:
     gym.register(
@@ -38,6 +37,8 @@ if env_id not in gym.envs.registry:
         max_episode_steps=100,
     )
 env = gym.make("Preschool-v0")
+
+agent = Agent_Container_PG()
 
 # Set initial rules for the agent
 set_rules(agent)

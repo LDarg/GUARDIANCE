@@ -27,8 +27,6 @@ class Data_Processor_PG(Data_Processor):
             for item in observation["children"]
             if item[1].replace(" ", "_") in reasons
         }
-        if observation["happenings"]:
-            pass
         relevant_data["happenings"] = {
             item[0]: {
                 "zone_id": item[0],
@@ -68,11 +66,16 @@ class Data_Processor_PG(Data_Processor):
                              }
                             for rule in guiding_rules if rule[0][0] in [child["description"] for child in extracted_data["children"].values()]]
         
-        happenings = [{"zone_id": str(extracted_data["zones"][rule[1]]["zone_id"]),
-                  "reason": rule[0][0],
-                  "required_MAT": rule[0][1]}
-                  for rule in guiding_rules if rule[0][0] in [happening["description"] for happening in extracted_data["happenings"].values()]]
-                   #for rule in guiding_rules if rule[0][0] in [zone["description"] for zone in extracted_data["zones"].values()]]
+        happenings = [{"zone_id": str(extracted_data["happenings"][rule[1]]["zone_id"]),
+              "reason": rule[0][0],
+              "required_MAT": rule[0][1]}
+              for rule in guiding_rules if rule[0][0] in [happening["description"] for happening in extracted_data["happenings"].values()]]
+        
+       #happenings = [{"zone_id": str(extracted_data["zones"][rule[1]]["zone_id"]),
+       #           "reason": rule[0][0],
+       #           "required_MAT": rule[0][1]}
+        #          for rule in guiding_rules if rule[0][0] in [happening["description"] for happening in extracted_data["happenings"].values()]]
+        #           #for rule in guiding_rules if rule[0][0] in [zone["description"] for zone in extracted_data["zones"].values()]]
 
         normative_reasons= {"child_conditions": child_conditions, "happenings": happenings}
         DMM_input = normative_reasons

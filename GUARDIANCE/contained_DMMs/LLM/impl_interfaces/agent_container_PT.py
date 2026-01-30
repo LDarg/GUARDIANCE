@@ -21,7 +21,7 @@ class Agent_Container_PT(Agent_Container):
 
     def take_action(self, observation):
         # Update normatively relevant information and guiding rules based on the new observation
-        self.moral_module.update_normatively_relevant_information(observation)
+        self.moral_module.update_relevant_information(observation)
         self.moral_module.update_guiding_rules()
 
         # Let the DMM choose an action 
