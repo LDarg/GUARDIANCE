@@ -8,8 +8,7 @@ def visualize(agent, env, seed=None):
 
         env.set_render_mode('human')
         agent.policy_dqn.eval()  
-        
-        #state, _ = env.reset()
+    
 
         while True:
             state, _ = env.reset()
@@ -17,9 +16,7 @@ def visualize(agent, env, seed=None):
             truncated = False      
 
             while(not terminated and not truncated):
-                # select morally permissible action  
                 with torch.no_grad():
-                    # actions: 0=left,1=down,2=right,3=up
                     action = agent.policy_dqn(agent.transformation(state)).argmax().item()
                 state,reward,terminated,truncated,_ = env.step(("move", action))  
                 if reward != 0:

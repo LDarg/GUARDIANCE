@@ -32,7 +32,7 @@ class Zone():
 class Learning_Station():
     def __init__(self, coordinates):
         self.coordinates = coordinates
-        self.steps_until_finished = 1  # takes 1 time-step to finish the learning station
+        self.steps_until_finished = 1  
     
     def progress(self):
         self.steps_until_finished -= 1
@@ -70,7 +70,7 @@ class Map():
         ])
 
     def spawn_learning_stations(self):
-        for _ in range(3):  # spawn 3 learning stations
+        for _ in range(3):  # Spawn 3 learning stations
             learning_station = Learning_Station(self.random_location())
             self.learning_stations.add(learning_station)
 
@@ -89,7 +89,7 @@ class Map():
 
     def generate_happening(self):
         zone = random.choice(list(self.zones))
-        # ensures that only one happening occurs at a time and thus, that there is at least one zone where the agent can move without violating a constraint
+        # Ensures that only one happening occurs at a time and thus, that there is at least one zone where the agent can move without violating a constraint
         if not any(zone.happening for zone in self.zones):
             zone.happening = random.choice(self.happenings)
 
@@ -103,7 +103,7 @@ class Map():
         return False
 
     """
-    returns zone for coordinates
+    Return zone for coordinates
     """
     def get_zone(self, coordinates):
         for zone in self.zones:
@@ -126,18 +126,16 @@ class Preschool_Grid(gym.Env):
         self.render_mode = render_mode
 
         self.reset(options=None)
-        
-        #self.goal_position = (random.randint(self.map.width), random.randint(self.map.height))
 
         assert render_mode is None or render_mode in self.metadata["render_modes"]
 
         """
-        the observation space:
-        the observation is a one hot encoding of the agent position, the person positions and the water tiles flattened to a 1d vector (np.array)
+        The (RL-)observation space:
+        The observation is a one hot encoding of the agent position.
         """
         self.size = self.map.width * self.map.height
-        self.grid_width = self.map.width   # number of columns in the grid
-        self.grid_height = self.map.height   # number of rows in the grid
+        self.grid_width = self.map.width  
+        self.grid_height = self.map.height  
         len_obs_dict = len(self.get_obs_dict())
         self.total_grid_cells = self.map.width  * self.map.height
         observation_size = len_obs_dict * self.total_grid_cells
@@ -149,18 +147,17 @@ class Preschool_Grid(gym.Env):
         )
 
         """
-        the action space (primitive actions the agent can take):
+        The action space (primitive actions the agent can take):
         0:  "right",
         1:  "down",
         2:  "left",
-        3:  "up",
-        4:  "pull out of water" 
+        3:  "up"
         """
         self.action_space = spaces.Discrete(4)
         self.directions = [np.array([1, 0]), np.array([0, 1]), np.array([-1, 0]), np.array([0, -1])]
 
         """
-        mapping of primitive actions from `self.action_space` to
+        Mapping of primitive actions from `self.action_space` to
         the direction the agent will walk in if that action is taken.
         """
         self.action_to_direction = {
@@ -171,10 +168,10 @@ class Preschool_Grid(gym.Env):
         }
 
         """
-        setting parameters for rendering the environment
+        Setting parameters for rendering the environment
         """
-        cell_width = 100  # width of each cell in pixels
-        cell_height = 100  # height of each cell in pixels
+        cell_width = 100 
+        cell_height = 100  
         self.navigation_area_width = self.grid_width * cell_width 
         self.navigation_area_height = self.grid_height * cell_height 
         self.render_mode = render_mode
@@ -188,15 +185,11 @@ class Preschool_Grid(gym.Env):
         self.map = Map(randm_gen)
         self.map.spawn_learning_stations()
 
-    """
-    functions for returning information about the state 
-    
-    """
     def observation(self):
         return np.array([self.agent_coordinates[0], self.agent_coordinates[1]])
 
     def get_obs_dict(self):
-        # agent's position (one-hot encoding)
+        # Agent's position (one-hot encoding)
         agent_window = np.zeros((self.map.height, self.map.width))
         agent_x, agent_y = self.agent_coordinates
         agent_window[agent_x, agent_y] = 1
@@ -231,7 +224,7 @@ class Preschool_Grid(gym.Env):
         }
     
     def random_agent_pos(self, random_gen):
-        # choose the agent's location randomly and ensure that the agent doesn't spawn at the goal position
+        # Choose the agent's location randomly and ensure that the agent doesn't spawn at the goal position
         self.agent_coordinates = np.array([
             random_gen.integers(0, self.map.width),
             random_gen.integers(0, self.map.height),
@@ -254,16 +247,16 @@ class Preschool_Grid(gym.Env):
         self.random_agent_pos(random_gen)
             
     """
-    update the environment according to what the agent does and subsequently update the environment according to how the persons move
+    Update the environment according to what the agent does and subsequently update the environment according to how the persons move
     """
     def step(self, action):
         reward = 0
         terminated = False
 
         if action[0] == "move":
-        # execute the action if it is taking a step in a direction
+        # Execute the action if it is taking a step in a direction
             direction = self.action_to_direction[action[1]]
-            # ensures that the agent's position stays in the grid
+            # Ensures that the agent's position stays in the grid
             self.agent_coordinates[0] = np.clip(
                 self.agent_coordinates[0] + direction[0], 0, self.map.width - 1
             )
@@ -271,7 +264,7 @@ class Preschool_Grid(gym.Env):
                 self.agent_coordinates[1] + direction[1], 0, self.map.height - 1
             )
 
-        # exceute the action if it is preparing a learning station
+        # Execute the action if it is preparing a learning station
         if action[0] == "prepare":
             for learning_station in self.map.learning_stations:
                 if np.equal(self.agent_coordinates, learning_station.coordinates).all():
@@ -287,7 +280,7 @@ class Preschool_Grid(gym.Env):
                         self.map.children.remove(child)
                         break
 
-        # generate normatively required goals and happenings with a certain probability
+        # Generate normatively required goals and happenings with a certain probability
         if random.random() < 0.15: #0.15
             self.map.generate_moral_goal()
         if random.random() < 0.1: #0.1
@@ -302,7 +295,7 @@ class Preschool_Grid(gym.Env):
     
     
     """
-    functions for rendering the envrionment 
+    Functions for rendering the envrionment 
     """
     
     def render(self):
@@ -382,12 +375,10 @@ class Preschool_Grid(gym.Env):
             if np.array_equal(self.agent_coordinates, child.coordinates):
                 left_pos = (agent_pos - np.array([smaller_radius, 0])).astype(int)
                 right_pos = (agent_pos + np.array([smaller_radius, 0])).astype(int)
-                #canvas.blit(resource_manager.child_icon, (left_pos, right_pos))
                 pygame.draw.circle(canvas, color_agent, tuple(left_pos), smaller_radius)
                 pygame.draw.circle(canvas, color_children, tuple(right_pos), smaller_radius)
             else:
                 child_pos = ((child.coordinates + 0.5) * np.array([pix_width_size, pix_height_size])).astype(int)
-                #canvas.blit(resource_manager.child_icon, (child_pos[0],child_pos[1]))
                 pygame.draw.circle(canvas, color_children, tuple(child_pos), int(min(pix_width_size, pix_height_size) / 3))
 
         if not any(np.array_equal(self.agent_coordinates, child.coordinates) for child in self.map.children):
@@ -424,7 +415,7 @@ class Preschool_Grid(gym.Env):
             )
 
         font = pygame.font.Font(None, 24)
-        facts = self.get_facts()  # get the list of facts
+        facts = self.get_facts()  
         zone = self.map.get_zone(self.agent_coordinates)
         pygame.draw.rect(self.window, (30, 30, 30), (0, self.navigation_area_height, self.navigation_area_width, facts_area_height))
 

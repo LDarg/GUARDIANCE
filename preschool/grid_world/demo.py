@@ -5,10 +5,6 @@ import ast
 from preschool.grid_world.preschool_grid import Preschool_Grid
 from preschool.grid_world.rand_target import Rand_Target, PrescCoordinates
 
-"""
-Visualizes an instance of the bridge environment with random actions, printing the action, reward, and state at each step.
-"""
-
 def demo(env):
     """
     Runs an environment with random actions.

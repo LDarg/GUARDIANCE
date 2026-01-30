@@ -35,8 +35,8 @@ class MAT_Mapping(ABC):
     def default_action(self, MATs, observation):
          pass
          """
-         execute a default action if the DMM fails to decide on an action that is conform with the guiding rules
-         for example, the overall agent could be instructed to do nothing to prevent causing harm (or move out of the way if it steers a physical system or call for human advisory etc.) 
+         Execute a default action if the DMM fails to decide on an action that is conform with the guiding rules.
+         For example, the  agent could be instructed to do nothing to prevent causing harm (or move out of the way if it steers a physical system or call for human advisory etc.) 
 
          Args:
             MATs: Macro-action-types that are overall binding. 

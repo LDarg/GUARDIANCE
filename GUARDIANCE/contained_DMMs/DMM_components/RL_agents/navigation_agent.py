@@ -8,7 +8,7 @@ import logging
 from torch import nn
 import os
 import gymnasium as gym
-from preschool.grid_world.rand_target import Rand_Target, PrescCoordinates, Extended
+from preschool.grid_world.rand_target import Rand_Target, Extended, PrescFlattened
 import sys
 
 logger = logging.getLogger(__name__)
@@ -46,12 +46,15 @@ def save_agent(agent, agent_name):
     torch.save(save_dict, file_path)
     logger.info(f"Agent saved to {file_path}")
 
+"""
+Implement a DRL algorithm 
+"""
 class RL_agent:
     def __init__(self, env, lr = 0.001, sync_rate = 1000, replay_memory_size=1000, mini_batch_size= 32):
 
         self.env = env
 
-        #set up hyperparameters for DRL
+        #set up hyperparameters 
         self.lr = lr        
         self.discount = 0.9            
         self.sr = sync_rate       
@@ -112,8 +115,6 @@ class RL_agent:
                 # execute the agent's action choice
                 new_state,reward,terminated,truncated, info = env.step(("move", action))
 
-
-                #self.HER_transformation(new_state,reward,terminated,truncated, info)
                 # add sample to memory
                 memory.append((state, action, new_state, reward, terminated, truncated)) 
 
@@ -144,7 +145,6 @@ class RL_agent:
 
         env.close()
 
-        #sum_rewards = np.zeros(episodes)
         sum_rewards = np.array([np.sum(rewards_per_episode[max(0, x-200):x+1]) for x in range(episodes)])
 
         plot_training_progress(sum_rewards, agent_name)
@@ -212,8 +212,6 @@ if __name__ == "__main__":
     if not any(isinstance(h, logging.StreamHandler) and getattr(h, "stream", None) is sys.stdout for h in root_logger.handlers):
         root_logger.addHandler(stream_handler)
 
-    logger.info("Logger configured to output to terminal")
-
     env_id = 'Preschool-v0'
 
     if env_id not in gym.envs.registry:
@@ -224,8 +222,10 @@ if __name__ == "__main__":
         )
     env = gym.make(env_id)
     env = Rand_Target(env)
-    env = Extended(env)
+    env = PrescFlattened(env)
     agent = RL_agent(env)
+
+
 
     training_episodes = 800
     train_navigation_policy = agent.train_navigation_policy(env=env, episodes=training_episodes, name=f"navigation_agent_{training_episodes}_episodes", pb=True)

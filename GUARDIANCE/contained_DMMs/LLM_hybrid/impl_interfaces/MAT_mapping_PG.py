@@ -7,7 +7,7 @@ import numpy as np
 config = Config()
 
 """
-An MAT_mapping for the text-version of the preschool setting navigated by an LLM agent.
+A MAT-mapping for the text-version of the preschool setting navigated by an LLM agent.
 """
 class MAT_mapping_PG(MAT_Mapping):
     def __init__(self):
@@ -21,20 +21,18 @@ class MAT_mapping_PG(MAT_Mapping):
         if MAT[0] == "Stay_out_of_the_zone":
             y_coordinate_boundary = 3
             zone = next(zone for zone in observation["zones"] if zone["zone_id"] == MAT[1])
-            # check if the agent is in the left zone
             if any(np.array_equal(coord, np.array([0, 0])) for coord in zone["coordinates"]):
-                #check if the agent does not move out of it
+                #Check if the agent does not move out of it
                 if any(np.array_equal(observation["agent_coordinate"], coord) for coord in zone["coordinates"]) and action != ("move", 0):
                     return MAT
-                #check if the agent wants to enter the zone
+                #Check if the agent is about to enter the zone
                 if observation["agent_coordinate"][0] == y_coordinate_boundary+1 and action == ("move", 2):
                     return MAT
-            # the agent is in the right zone
             else:
-                # check if the agent does not move out of it
+                # Check if the agent does not move out of it
                 if any(np.array_equal(observation["agent_coordinate"], coord) for coord in zone["coordinates"]) and action != ("move", 2):
                     return MAT
-                # check if the agent wants to enter the zone
+                # Check if the agent is about to enter the zone
                 if observation["agent_coordinate"][0] == y_coordinate_boundary and action == ("move", 0):
                     return MAT
                 
@@ -52,7 +50,7 @@ class MAT_mapping_PG(MAT_Mapping):
         for rule in set_of_rules:
             if rule[0][1] == "Stay_out_of_the_zone":
                 forbidden_zones += [zone for zone in extracted_data["zones"].values() if zone["zone_id"] == rule[1]]
-        # both zones must not be entered; but the agent has to stay in one 
+        # The agent must not be in both zones; otherwise the oblgiations are conflcited
         if len(forbidden_zones) >= 2:
             return True
 

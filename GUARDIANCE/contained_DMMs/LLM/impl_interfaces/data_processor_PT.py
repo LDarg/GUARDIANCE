@@ -54,7 +54,7 @@ class Data_Processor_PT(Data_Processor):
         return groundings
     
     """
-    all information is passed to the DMM; no filtering is applied
+    All information is passed to the DMM; no filtering is applied.
     """
     def DMM_observation(self, extracted_data, guiding_rules):
         
@@ -79,7 +79,7 @@ class Data_Processor_PT(Data_Processor):
         return DMM_observation
     
     """
-    similar to the input of the DMM; station zones are filtered out, because they are only relevant for the deployment prupose, not for behaving compliant with normative requirements
+    Similar to the input of the DMM; learning stations are filtered out, because they are irrelevant for behaving compliant with normative requirements.
     """
     def guard_observation(self, extracted_data, guiding_rules):
 

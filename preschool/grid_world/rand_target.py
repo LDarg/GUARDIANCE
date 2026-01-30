@@ -21,29 +21,28 @@ class Rand_Target(gym.Wrapper):
                 dtype=np.float32
             )
 
-            #modify this to as a hyperparameter for GCRL with HER
-            self.max_steps = 20
+            self.max_steps = 30
 
         def observation(self):
             obs_dict = self.get_obs_dict()
 
-            # flatten 
+            # Flatten 
             agent_flat = obs_dict["agent_window"].flatten()
             target_flat = obs_dict["target_window"].flatten()
 
-            # concatenate into one 1D array
+            # Concatenate into one 1D array
             nn_input = np.concatenate([agent_flat, target_flat])
 
             return np.array(nn_input.astype(np.float32))
     
         def get_obs_dict(self):
 
-            # agent's position (one-hot encoding)
+            # Agent's position (one-hot encoding)
             agent_window = np.zeros((self.env.grid_height, self.env.grid_width))
             agent_x, agent_y = self.agent_coordinates
             agent_window[agent_y, agent_x] = 1
 
-            # target position (one-hot encoding)
+            # Target position (one-hot encoding)
             target_window = np.zeros((self.env.grid_height, self.env.grid_width))
             target_x, target_y = self.target_position
             target_window[target_y, target_x] = 1
@@ -86,8 +85,8 @@ class Rand_Target(gym.Wrapper):
                 reward = 1
                 terminated = True
             self.steps_counter += 1
-            #if self.steps_counter >= self.max_steps:
-            #    truncated = True
+            if self.steps_counter >= self.max_steps:
+                truncated = True
             observation = self.observation()
             info = self.get_obs_dict()
             return observation,reward,terminated,truncated,info

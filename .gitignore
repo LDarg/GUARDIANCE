@@ -8,3 +8,4 @@ __pycache__/
 .github
 *.log
 .github/
+.saved_plots/

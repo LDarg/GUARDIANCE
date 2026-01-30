@@ -6,14 +6,6 @@ from GUARDIANCE.contained_DMMs.LLM_hybrid.impl_interfaces.guard_PG import Guard_
 import logging
 from GUARDIANCE.contained_DMMs.LLM_hybrid.impl_interfaces.LLM_hybrid import LLM_hybrid
 
-
-action_to_direction = {
-    0: "right",
-    1: "down",
-    2: "left",
-    3: "up",
-}
-
 logger = logging.getLogger(__name__)
 
 
@@ -28,7 +20,7 @@ class Agent_Container_PG(Agent_Container):
 
         self.static_env_info = None
 
-        # normatively relevant information used for applying a reason theory to ensure normative conformity
+        # Normatively relevant information used for applying a reason theory to ensure normative conformity
         self.normative_reasons = None
         self.guiding_rules = set()
 
@@ -74,6 +66,7 @@ class Agent_Container_PG(Agent_Container):
 
         action = self.DMM.take_action(DMM_input)
 
+        # Call the guard to check whether the action the agent wants to execute is conform with the binding rules; possibly initiate course correction
         guard_observation = self.data_processor.guard_observation(extracted_data, self.guiding_rules)
         violated_obligation = self.guard.violated_obligation(action, self.guiding_rules, guard_observation)
         if violated_obligation:

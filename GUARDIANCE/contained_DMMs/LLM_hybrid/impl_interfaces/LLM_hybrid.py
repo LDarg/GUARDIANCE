@@ -8,7 +8,7 @@ import uuid
 # baml interface for API calls to LLMs (part of the agent that decides on the course of action)
 from GUARDIANCE.contained_DMMs.DMM_components.baml.baml_client import b
 
-# reinforcement learning agent (tool used by the LLM to navigate in the environment)
+# Reinforcement Learning agent (called by the LLM to navigate in the environment)
 rl_agent_name = "navigation_agent_700_episodes"
 rl_agent,_= setup_agent(rl_agent_name)
 
@@ -21,7 +21,6 @@ action_to_direction = {
 
 logger = logging.getLogger(__name__)
 
-
 class LLM_hybrid(DMM):
     def __init__(self):
         self.LLM = b
@@ -29,7 +28,6 @@ class LLM_hybrid(DMM):
         self.target_coordinate = None
 
         self.DMM_input = None
-
 
     def take_action(self, DMM_input):
         
@@ -44,10 +42,10 @@ class LLM_hybrid(DMM):
         
         if np.array_equal(agent_coordinate, self.target_coordinate):
             self.target_coordinate = None
-        #follow course of action until target reached or normative reasons changed
+        #Follow course of action until target position is reached or normative reasons changed
         if self.target_coordinate is not None and not reasons_changed:
             action = self.navigate(rl_obs)
-        #if the target is reached or the reasons have changed, ask the LLM for a new action plan
+        #If the target is reached or the reasons have changed, ask the LLM for a new action plan
         else:
             output =self.LLM.Take_Action_PG(**self.DMM_input)
             self.chosen_action = output
@@ -77,7 +75,7 @@ class LLM_hybrid(DMM):
         if feedback:
             self.DMM_input["feedback"] = feedback
 
-    #transforms the output to the format expected as input from the environment 
+    #Tranforms the output to the format expected as input from the environment 
     def output_to_action(self, LLM_Output, rl_obs):
         if LLM_Output.type == "move":
             self.target_coordinate = np.array(LLM_Output.target_coordinate)
@@ -101,13 +99,10 @@ class LLM_hybrid(DMM):
             input = {"type": "idle"}
         return input
     
-    
     def retrigger(self, rl_obs):
         output = b.Take_Action_PG(**self.DMM_input)
         action = self.output_to_action(output, rl_obs)
         return action
-    
-    #TODO: das soll nicht zu DMM_input hinzugefügt werden 
 
     def add_feedback(self, violated_obligation, action):
         relevant_state_elements = {"agent_coordinate": self.DMM_input["agent_coordinate"],

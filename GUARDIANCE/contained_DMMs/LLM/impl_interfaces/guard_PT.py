@@ -6,16 +6,11 @@ class Guard_PT(Guard):
     def __init__(self, mat_mapping:MAT_Mapping):
         self.mat_mapping = mat_mapping
 
-    """
-    monitor and ensure that the actions proposed by the DMM conform to the guiding rules
-    """
     def ensure_conformity(self, action, guiding_rules, observation):
         MATs = [(rule[0][1],rule[1]) for rule in guiding_rules]
         for MAT in MATs:
-            violated_obligation = self.mat_mapping.obligation_violated(action, MAT, observation)
             if self.mat_mapping.obligation_violated(action, MAT, observation):  
                 self.inform_human(action, MAT)
-                self.retrigger(action, violated_obligation)
                 action = self.mat_mapping.default_action( MATs, observation)
                 return action
 

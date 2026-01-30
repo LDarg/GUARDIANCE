@@ -13,7 +13,6 @@ class ResourceManager:
     @staticmethod
     def get_dir_name():
         return os.path.join(os.path.dirname(os.path.abspath(__file__)), "pics")
-        #return os.path.dirname(os.path.abspath(__file__))
 
     def load_icons(self, size=(100,100)):
         self.book_icon = self.load_and_scale("book.png", size)

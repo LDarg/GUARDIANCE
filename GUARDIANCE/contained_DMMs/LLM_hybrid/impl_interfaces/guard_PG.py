@@ -17,19 +17,14 @@ class Guard_PG(Guard):
 
         return None
 
-    """
-    monitor and ensure that the actions proposed by the DMM conform to the guiding rules
-    """
     def ensure_conformity(self, action, guiding_rules, observation):
         MATs = [(rule[0][1],rule[1]) for rule in guiding_rules]
         for MAT in MATs:
             violated_obligation = self.mat_mapping.obligation_violated(action, MAT, observation)
             if self.mat_mapping.obligation_violated(action, MAT, observation):  
                 self.inform_human(action, MAT)
-                self.retrigger(action, violated_obligation)
                 action = self.mat_mapping.default_action( MATs, observation)
                 return action
-
         return action
     
     def inform_human(self, action, violated_obligation):

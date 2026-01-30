@@ -7,9 +7,9 @@ class Guard(ABC):
         self.mat_mapping: MAT_Mapping = mat_mapping
 
     """
-    monitor and ensure that the actions proposed by the DMM conform to the guiding rules
+    Monitor the agent's behavior and ensure that the actions proposed by the DMM conform to the guiding rules.
 
-      Args:
+    Args:
         action: the action that the DMM wants to execute
         guiding_rules: rules that the agent need to conform to 
         observation: the information of the state of the environment that is normatively relevant 
@@ -22,7 +22,7 @@ class Guard(ABC):
         pass
     
     """
-    inform the human overseer that the DMM wants to execute an action that is not conform with a binding obligation
+    Inform the human overseer that the DMM wants to execute an action that is not conform with a binding obligation.
     """
     @abstractmethod
     def inform_human(self, action, violated_obligation):

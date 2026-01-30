@@ -94,7 +94,6 @@ class Preschool_Text(gym.Wrapper):
                             break
 
             # generate moral goals and happenings with a certain probability
-            # SIMPLIFICATION: ensure that for every condition, there is only one instance of a child with that condition
             if random.random() < 0.3:
                 if len(self.map.children) < len(self.map.config.conditions):
                     self.map.generate_moral_goal_unique()
@@ -178,7 +177,7 @@ class Preschool_Text(gym.Wrapper):
                     if self.map.coordinates_in_zone(learning_station.coordinates, zone):
                         # Draw book icon at current offset
                         canvas.blit(resource_manager.book_icon, (icon_x, icon_y))
-                        # Move right for the next icon, add some spacing
+                        # Move right for the next icon, add spacing
                         icon_x += icon_w + 5
                                 
                 resource_manager.child_icon_w, resource_manager.child_icon_h = resource_manager.child_icon.get_width(), resource_manager.child_icon.get_height()
@@ -189,7 +188,7 @@ class Preschool_Text(gym.Wrapper):
                     if self.map.coordinates_in_zone(child.coordinates, zone):
                         # Draw child icon at current offset
                         canvas.blit(resource_manager.child_icon, (icon_x, icon_y))
-                        # Move right for the next icon, add some spacing
+                        # Move right for the next icon, add spacing
                         icon_x += resource_manager.child_icon_w + 5  
 
                 min_x, min_y = np.min(zone_coords, axis=0)
@@ -223,7 +222,7 @@ class Preschool_Text(gym.Wrapper):
 
             pygame.draw.circle(
                 canvas,
-                (0, 0, 0),  # agent in white
+                (0, 0, 0),  
                 zone_center,
                 min(pix_width_size, pix_height_size) / 2.5,
             )

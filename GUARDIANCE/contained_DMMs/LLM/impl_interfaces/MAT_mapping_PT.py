@@ -2,18 +2,18 @@ from preschool.config import Config
 from GUARDIANCE.interfaces.MAT_mapping import MAT_Mapping
 import uuid
 
+# Configuration for the preschool environment including inforamtion about which MAT is required for helping children 
 config = Config()
 
 """
 An MAT_mapping for the text-version of the preschool setting navigated by an LLM agent.
 """
 class MAT_mapping_PT(MAT_Mapping):
-    def __init__(self, config):
-        # config is needed for retrieving the infomration which action is required for which child condition 
+    def __init__(self):
         self.config = config
 
     """
-    PRESCHOOL: determining the set of allowed actions for one MAT rule-based hardcoded according to the 1 to 1  mapping
+    Returns the obligation that is violated by the action in the given observation; else returns None
     """
     def obligation_violated(self, action, MAT, observation):
 
@@ -38,11 +38,11 @@ class MAT_mapping_PT(MAT_Mapping):
         return False
     
     """
-    rules for what needs to be done given a certain set of MATs (encode the correct next primitive action for every situation possible)
-    of course this is only possible if there is no epistemic or normative uncertainty and the action space is overseeable which is normally not the case
+    Rules for what needs to be done given a certain set of MATs (encode the correct next primitive action for every situation possible)
+    This is only possible if there is no epistemic or normative uncertainty and the action space is overseeable which is normally not the case
     """
     def default_action(self, MATs, observation):
-        # help the child in need
+        # Help the child in need
         child_in_need  = next(
             (MAT[1] for MAT in MATs if MAT[0] != "Stay_out_of_the_zone"),
             None
@@ -51,7 +51,7 @@ class MAT_mapping_PT(MAT_Mapping):
             child_zone = next(child_condition["zone_id"] for child_condition in observation["child_conditions"] if child_condition["child_id"] == child_in_need)
             if observation["agent_zone"]["zone_id"] != child_zone:
                 return ("move", uuid.UUID(child_zone))
-         # get out of the forbidden zone
+         # Get out of the forbidden zone
         else:
             forbidden_zone = next(
                 (MAT[1] for MAT in MATs if MAT[0] == "Stay_out_of_the_zone"),

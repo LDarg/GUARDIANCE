@@ -93,7 +93,7 @@ class ReasoningUnit():
             if self.compute_binding(set(scenario), groundings, extracted_data):
                 proper_scenarios.append(set(scenario))
 
-        #among the proper scenarios, check whether goals should be prioritized or if the DMM is supposed to follow a stragegy following all goals equally 
+        #among the proper scenarios, check whether goals should be prioritized or if the DMM is supposed to follow one strategy for fulfilling all goals  
         for scenario in proper_scenarios:
             for rule in set(scenario):
                 if self.reason_theory.nodes[rule[0][1]].get('subclass') == 'goal':
@@ -125,10 +125,6 @@ class ReasoningUnit():
             if other_rule in trade_off_prios:
                 return other_rule
 
-        # if there is another rule of lesser priority in the scenario than the rule, then the scenario is not selectable
-        #if any(other_rule in trade_off_prios for other_rule in [grounded_rule[0] for grounded_rule in scenario]):
-        #    return rule
-
         for next_rule in trade_off_prios:
             lesser_prio_goal =  self.trade_off_priorities(next_rule, scenario)
             if lesser_prio_goal:
@@ -149,31 +145,41 @@ class ReasoningUnit():
         return groundings
     
     """
-    compute the binding rules for a subset of the agent's rules
+    Compute whether a subset of grounded rules constitutes a binding scenario.
     """
     def compute_binding(self, grounded_rules_scenario, triggered_grounded_rules, extracted_data):
 
         triggerd_rules_not_in_scenario = set(triggered_grounded_rules) - set(grounded_rules_scenario)
         
 
-        # prüft, ob regeln in dem scenario conflicted sind, wenn ja, ist das scenario nicht binding
-        scenario_conflicted = self.MAT_mapping.execution_conflicted(grounded_rules_scenario, extracted_data)
+        # If there are rules within the scenario that are conflicting, the scenario is not binding
+        scenario_conflicted = self.MAT_mapping.execution_conflicted(
+            grounded_rules_scenario, extracted_data
+        )
         if scenario_conflicted:
             return False
         
-        # prüft für jede regel, die triggered ist, aber nicht in dem scenario, ob die regel conflicted ist mit einer regel in dem scenario;
-        # wenn das nicht der fall ist, dann ist das scenario nicht binding (es werden regeln nicht berücksichtigt, die zusammen mit denen in dem scenario ausgeführt werden können)
-        unconflicted_triggered_rules = self.unconflicted(grounded_rules_scenario, triggerd_rules_not_in_scenario, extracted_data)
+        # For each triggered rule not included in the scenario, check whether it conflicts
+        # with at least one rule in the scenario. If a triggered rule can be jointly executed
+        # with the scenario rules, the scenario is not binding.
+        unconflicted_triggered_rules = self.unconflicted(
+            grounded_rules_scenario, triggerd_rules_not_in_scenario, extracted_data
+        )
         if unconflicted_triggered_rules:
             return False
         
-        # hier steht schon fest, dass alle regeln in triggerd_rules_not_in_scenario conflicted mit mindestens einer regel in dem scenario sind
-        # prüft, ob eine regel in triggerd_rules_not_in_scenario eine höhere priorität hat als eine regel in dem scenario; wenn ja, dann muss es auch eine regel in dem scenario geben, die eine höhere priorität hat als die regel in triggerd_rules_not_in_scenario; sonst ist das scenario nicht binding
-        defeated_rule_in_scenario = self.defeated(grounded_rules_scenario, triggerd_rules_not_in_scenario)
+        # Check priority relations:
+        # If a conflicting external rule has higher priority than a scenario rule,
+        # there must exist a scenario rule that defeats it; otherwise, the scenario
+        # is not binding.
+        defeated_rule_in_scenario = self.defeated(
+            grounded_rules_scenario, triggerd_rules_not_in_scenario
+        )
         if defeated_rule_in_scenario:
             return False
 
         return True
+
 
     def unconflicted(self, grounded_rules_scenario, difference, extracted_data): 
 
@@ -187,7 +193,6 @@ class ReasoningUnit():
 
     def defeated(self, grounded_rules_scenario, triggered_rules_not_in_scenario):
 
-        #wenn es eine regel r1 (triggered und nicht Teil des scenarios) gibt, die conflicted ist mit einer regel r2 in dem scenario und eine höhere priorität hat als r2, dann muss es eine weitere regel r3 in dem scenario geben, die eine höhere priorität hat als die regel r1
         for rule in triggered_rules_not_in_scenario:
             for second_rule in grounded_rules_scenario:
                  if (second_rule[0][0],second_rule[0][1]) in self.reason_theory.get_edge_data(rule[0][0], rule[0][1])['lower_order']:

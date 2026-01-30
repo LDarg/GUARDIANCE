@@ -1,4 +1,4 @@
-from GUARDIANCE.contained_DMMs.LLM.contained_LLM_PT import contained_LLM_PT
+from GUARDIANCE.contained_DMMs.LLM.agent_container_PT import Agent_Container_PT
 from preschool.text_description.preschool_text import Preschool_Text
 import gymnasium as gym
 from preschool.rule_sets.rules import set_rules
@@ -28,8 +28,8 @@ def navigate(env, agent):
             _, _, terminated, truncated, info = env.step(action)
 
 
-# set up environment and agent
-agent = contained_LLM_PT()
+# Set up environment and agent
+agent = Agent_Container_PT()
 env_id = 'Preschool-v0'
 if env_id not in gym.envs.registry:
     gym.register(
@@ -40,9 +40,9 @@ if env_id not in gym.envs.registry:
 env = gym.make("Preschool-v0")
 env = Preschool_Text(env)
 
-# set initial rules for the agent
+# Set initial rules for the agent
 set_rules(agent)
 agent.reasoning_unit.log_reason_theory(logger)
 
-# start navigation
+# Start navigation
 navigate(env, agent)
