@@ -292,10 +292,11 @@ class Preschool_Grid(gym.Env):
                             self.map.children.remove(child)
                             break
 
-        #for zone in self.map.zones:
-        #    if zone.happening is not None:
-        #        if random.random() < 0.05:
-        #            zone.happening = None
+        # Update happenings: with a certain probability, happenings disappear
+        for zone in self.map.zones:
+            if zone.happening is not None:
+                if random.random() < 0.05:
+                    zone.happening = None
 
         # Generate normatively required goals and happenings with a certain probability
         if random.random() < 0.1: #0.15
