@@ -138,11 +138,11 @@ class Preschool_Grid(gym.Env):
         self.grid_height = self.map.height  
         len_obs_dict = len(self.get_obs_dict())
         self.total_grid_cells = self.map.width  * self.map.height
-        observation_size = len_obs_dict * self.total_grid_cells
+       # observation_size = len_obs_dict * self.total_grid_cells
         self.observation_space = spaces.Box(
             low=0,
             high=1,
-            shape=(observation_size,),
+            shape=(2,),
             dtype=np.float32
         )
 
@@ -253,9 +253,9 @@ class Preschool_Grid(gym.Env):
         reward = 0
         terminated = False
 
-        if action[0] == "move":
-        # Execute the action if it is taking a step in a direction
-            direction = self.action_to_direction[action[1]]
+        # Interface for receiveing an action for selcting a direction to move chosen by an RL agent as input
+        if isinstance(action, np.int64):
+            direction = self.action_to_direction[action]
             # Ensures that the agent's position stays in the grid
             self.agent_coordinates[0] = np.clip(
                 self.agent_coordinates[0] + direction[0], 0, self.map.width - 1
@@ -264,21 +264,34 @@ class Preschool_Grid(gym.Env):
                 self.agent_coordinates[1] + direction[1], 0, self.map.height - 1
             )
 
-        # Execute the action if it is preparing a learning station
-        if action[0] == "prepare":
-            for learning_station in self.map.learning_stations:
-                if np.equal(self.agent_coordinates, learning_station.coordinates).all():
-                    learning_station.progress()
-                    if learning_station.finished():
-                        self.map.learning_stations.remove(learning_station)
-                    break
+        # Interface for receiving actions including "prepare" and different kinds of "help" actions 
+        else:
+            if action[0] == "move":
+            # Execute the action if it is taking a step in a direction
+                direction = self.action_to_direction[action[1]]
+                # Ensures that the agent's position stays in the grid
+                self.agent_coordinates[0] = np.clip(
+                    self.agent_coordinates[0] + direction[0], 0, self.map.width - 1
+                )
+                self.agent_coordinates[1] = np.clip(
+                    self.agent_coordinates[1] + direction[1], 0, self.map.height - 1
+                )
 
-        if action[0] == "help":
-            for child in self.map.children:
-                if child.id == action[1] and np.equal(self.agent_coordinates, child.coordinates).all():
-                    if self.map.config.resolutions[child.condition].replace(" ", "_") == action[2]:
-                        self.map.children.remove(child)
+            # Execute the action if it is preparing a learning station
+            if action[0] == "prepare":
+                for learning_station in self.map.learning_stations:
+                    if np.equal(self.agent_coordinates, learning_station.coordinates).all():
+                        learning_station.progress()
+                        if learning_station.finished():
+                            self.map.learning_stations.remove(learning_station)
                         break
+
+            if action[0] == "help":
+                for child in self.map.children:
+                    if child.id == action[1] and np.equal(self.agent_coordinates, child.coordinates).all():
+                        if self.map.config.resolutions[child.condition].replace(" ", "_") == action[2]:
+                            self.map.children.remove(child)
+                            break
 
         # Generate normatively required goals and happenings with a certain probability
         if random.random() < 0.15: #0.15
