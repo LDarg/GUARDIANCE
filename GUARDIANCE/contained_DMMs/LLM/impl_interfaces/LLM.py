@@ -15,7 +15,6 @@ class LLM(DMM):
         DMM_observation = DMM_input
         output =self.LLM.Take_Action_Preschool(agent_zone=DMM_observation["agent_zone"], station_zones=DMM_observation["stations_zones"], zone_ids= DMM_observation["zone_ids"], child_conditions=DMM_observation["child_conditions"], happenings=DMM_observation["happenings"])
         action = self.output_to_action(output)
-
         return action
     
     #Transforms the output to the format expected as input from the environment 

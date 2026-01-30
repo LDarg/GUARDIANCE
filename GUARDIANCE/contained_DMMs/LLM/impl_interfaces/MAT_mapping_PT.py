@@ -19,7 +19,7 @@ class MAT_mapping_PT(MAT_Mapping):
 
         if MAT[0] == "Stay_out_of_the_zone":
             #agent plans to not move out of forbidden zone
-            if observation["agent_zone"]["zone_id"] == MAT[1]:
+            if uuid.UUID(observation["agent_zone"]["zone_id"]) == MAT[1]:
                 other_zones = [elem for elem in observation["zone_ids"] if elem != MAT[1]]
                 if not any(action == ("move", other_zone) for other_zone in other_zones):
                     return True
@@ -48,9 +48,12 @@ class MAT_mapping_PT(MAT_Mapping):
             None
         )
         if child_in_need:
-            child_zone = next(child_condition["zone_id"] for child_condition in observation["child_conditions"] if child_condition["child_id"] == child_in_need)
+            child_zone = next(child_condition["zone_id"] for child_condition in observation["child_conditions"] if uuid.UUID(child_condition["child_id"]) == child_in_need)
             if observation["agent_zone"]["zone_id"] != child_zone:
                 return ("move", uuid.UUID(child_zone))
+            else:
+                required_MAT = next(MAT[0] for MAT in MATs if MAT[1] == child_in_need)
+                return ("help", child_in_need, required_MAT)
          # Get out of the forbidden zone
         else:
             forbidden_zone = next(
@@ -61,7 +64,7 @@ class MAT_mapping_PT(MAT_Mapping):
             return ("move", uuid.UUID(other_zone))
     
     """
-    To determine conflicts (in Horty’s formalization of reasoning), a conformity check of MATs against the first elements of chains of primitive actions takes place here.
+    A conformity check of MATs against the first elements of chains of primitive actions to determine conflicts (in Horty’s formalization of reasoning).
     """
     def execution_conflicted(self, set_of_rules, extracted_data):
         forbidden_zones = []

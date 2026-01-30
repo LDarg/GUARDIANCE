@@ -71,7 +71,6 @@ class LLM_hybrid(DMM):
         with torch.no_grad():
             move_dir, _ = self.rl_agent.predict(rl_obs, deterministic=True)
             move_dir = int(move_dir)
-           # move_dir = self.rl_agent.policy_dqn(self.rl_agent.transformation(rl_obs)).argmax().item()
         return ("move", move_dir)
     
     def update_LLM_input(self, DMM_observation, feedback=None):
