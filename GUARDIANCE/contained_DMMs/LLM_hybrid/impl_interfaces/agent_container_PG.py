@@ -44,16 +44,13 @@ class Agent_Container_PG(Agent_Container):
 
         action = self.DMM.take_action(DMM_input)
 
-        # Call the guard to check whether the action the agent wants to execute is conform with the binding rules; possibly initiate course correction
+        # Call the guard to check whether the action the agent wants to execute is conform with the binding rules; 
+        # In case of a violation of noramtive requirements: give feedback initiate course correction
         guard_observation = self.moral_module.guard_observation()
-        violated_obligation = self.guard.violated_obligation(action, self.moral_module.guiding_rules_cache, guard_observation)
+        violated_obligation, action = self.guard.ensure_conformity(action, self.moral_module.guiding_rules_cache, guard_observation)
         if violated_obligation:
             self.DMM.add_feedback(violated_obligation, action)
             action = self.DMM.retrigger(rl_obs)
-            violated_obligation = self.guard.violated_obligation(action, self.moral_module.guiding_rules_cache, guard_observation)
-            if violated_obligation:
-                MATs = [(rule[0][1],rule[1]) for rule in self.moral_module.guiding_rules_cache]
-                action = self.mat_mapping.default_action(MATs, guard_observation)
             self.course_correction = True
 
         return action

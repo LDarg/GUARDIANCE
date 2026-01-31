@@ -7,26 +7,17 @@ class Guard_PG(Guard):
     def __init__(self, mat_mapping:MAT_Mapping):
         self.mat_mapping = mat_mapping
 
-    def violated_obligation(self, action, guiding_rules, guard_observation):
-        MATs = [(rule[0][1],rule[1]) for rule in guiding_rules]
-        for MAT in MATs:
-            violated_obligation = self.mat_mapping.obligation_violated(action, MAT, guard_observation) 
-            if violated_obligation:  
-                self.inform_human(action, MAT) 
-                return violated_obligation
-
-        return None
-
     def ensure_conformity(self, action, guiding_rules, observation):
+        violated_obligation = None
         MATs = [(rule[0][1],rule[1]) for rule in guiding_rules]
         for MAT in MATs:
             violated_obligation = self.mat_mapping.obligation_violated(action, MAT, observation)
-            if self.mat_mapping.obligation_violated(action, MAT, observation):  
+            if violated_obligation:
                 self.inform_human(action, MAT)
                 action = self.mat_mapping.default_action( MATs, observation)
-                return action
-        return action
+        return (violated_obligation, action)
     
     def inform_human(self, action, violated_obligation):
         logging.warning(f"The action {action} violates the obligation {violated_obligation}")
         pass
+
