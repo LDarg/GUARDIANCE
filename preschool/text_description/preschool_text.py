@@ -94,10 +94,10 @@ class Preschool_Text(gym.Wrapper):
                             break
 
             # generate moral goals and happenings with a certain probability
-            if random.random() < 0.3:
+            if random.random() < 0.5: #0.3
                 if len(self.map.children) < len(self.map.config.conditions):
                     self.map.generate_moral_goal_unique()
-            if random.random() < 0.2:
+            if random.random() < 1: #0.2
                 self.map.generate_happening()
 
             observation = self.observation()

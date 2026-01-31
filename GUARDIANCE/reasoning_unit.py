@@ -93,7 +93,7 @@ class ReasoningUnit():
             if self.compute_binding(set(scenario), groundings, extracted_data):
                 proper_scenarios.append(set(scenario))
 
-        #among the proper scenarios, check whether goals should be prioritized or if the DMM is supposed to follow one strategy for fulfilling all goals  
+        #Among the proper scenarios, check whether goals should be prioritized or if the DMM is supposed to follow one strategy for fulfilling all goals  
         for scenario in proper_scenarios:
             for rule in set(scenario):
                 if self.reason_theory.nodes[rule[0][1]].get('subclass') == 'goal':
@@ -195,8 +195,20 @@ class ReasoningUnit():
 
         for rule in triggered_rules_not_in_scenario:
             for second_rule in grounded_rules_scenario:
-                 if (second_rule[0][0],second_rule[0][1]) in self.reason_theory.get_edge_data(rule[0][0], rule[0][1])['lower_order']:
-                     if not any((rule[0][0], rule[0][1]) in self.reason_theory.get_edge_data(third_rule[0][0], third_rule[0][1])['lower_order'] for third_rule in grounded_rules_scenario):
-                         return True
+                 lower_order_rules_1 = self.reason_theory.get_edge_data(rule[0][0], rule[0][1])['lower_order']
+                 lower_order_rules_1 = self._ensure_edge_tuple(lower_order_rules_1)
+                 if (second_rule[0][0],second_rule[0][1]) in lower_order_rules_1:
+                    for third_rule in grounded_rules_scenario:
+                        lower_order_rules_2 = self.reason_theory.get_edge_data(third_rule[0][0], third_rule[0][1])['lower_order']
+                        lower_order_rules_2 = self._ensure_edge_tuple(lower_order_rules_2)
+                        if (rule[0][0], rule[0][1]) in lower_order_rules_2:
+                           return False 
+                    return True
         return False
 
+    def _ensure_edge_tuple(self, lo):
+        if not lo:
+            return ()
+        if isinstance(lo[0], str):
+            return (lo,)
+        return lo
