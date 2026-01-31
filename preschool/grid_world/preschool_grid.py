@@ -295,13 +295,13 @@ class Preschool_Grid(gym.Env):
         # Update happenings: with a certain probability, happenings disappear
         for zone in self.map.zones:
             if zone.happening is not None:
-                if random.random() < 0.05:
+                if random.random() < 0.1:
                     zone.happening = None
 
         # Generate normatively required goals and happenings with a certain probability
         if random.random() < 0.1: #0.15
             self.map.generate_moral_goal()
-        if random.random() < 1: #0.1
+        if random.random() < 0.1: #0.1
             self.map.generate_happening()
 
         observation = self.observation()

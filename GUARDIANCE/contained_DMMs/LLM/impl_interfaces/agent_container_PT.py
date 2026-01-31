@@ -6,6 +6,7 @@ from GUARDIANCE.contained_DMMs.LLM.impl_interfaces.guard_PT import Guard_PT
 from GUARDIANCE.contained_DMMs.LLM.impl_interfaces.moral_module_PT import Moral_Module_PT
 import logging
 from GUARDIANCE.contained_DMMs.LLM.impl_interfaces.LLM import LLM
+import uuid
 
 logger = logging.getLogger(__name__)
 

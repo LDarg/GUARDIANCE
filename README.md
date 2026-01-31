@@ -1,6 +1,6 @@
 # A Framework for Guiding and Guarding AI Agents
 
-This repository contains a framework for an architecture that integrates a module for symbolic processing of guiding rules for an AI agentic system of which the conformance is enforced through a guard that monitors the agent's behavior and corrects them. The architecture is introduced in [Breaking Up with Normatively Monolithic Agency with GRACE: A Reason-Based Neuro-Symbolic Architecture for Safe and Ethical AI Alignment](https://arxiv.org/abs/2601.10520).
+This repository introduces a framework for an AI architecture that integrates symbolic reasoning over guiding rules, with a guard mechanism enforcing behavior that is conform with normative requirements by monitoring and correcting system behavior. The architecture is introduced in [Breaking Up with Normatively Monolithic Agency with GRACE: A Reason-Based Neuro-Symbolic Architecture for Safe and Ethical AI Alignment](https://arxiv.org/abs/2601.10520).
 
 It further implements an environment simulating a preschool setting in which an AI steers a robot that is tasked with preparing learning stations while it further needs to conform to situationlly arising normative requirements. The environment is implemented as text-adventure and as grid-world.
 
