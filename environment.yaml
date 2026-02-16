@@ -13,6 +13,7 @@ dependencies:
   - sympy=1.13.2
   - pydantic=1.10.12
   - stable-baselines3=2.2.0
+  - pyyaml
   - pip
   - pip:
       - -e .
